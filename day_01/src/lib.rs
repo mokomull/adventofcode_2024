@@ -40,6 +40,17 @@ impl Day for Solution {
     }
 
     fn part2(&self) -> anyhow::Result<u64> {
-        todo!()
+        let mut counts: HashMap<u64, u64> = HashMap::new();
+
+        for &x in &self.right {
+            *counts.entry(x).or_default() += 1;
+        }
+
+        Ok(self
+            .left
+            .iter()
+            .cloned()
+            .map(|l| l * counts.get(&l).cloned().unwrap_or_default())
+            .sum())
     }
 }
