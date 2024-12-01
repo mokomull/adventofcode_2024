@@ -1,0 +1,7 @@
+[package]
+name = "prelude"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+prelude_2023 = { git = "https://github.com/mokomull/adventofcode_2023", package = "prelude" }
