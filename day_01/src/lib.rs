@@ -23,7 +23,20 @@ impl Day for Solution {
     }
 
     fn part1(&self) -> anyhow::Result<u64> {
-        todo!()
+        let mut left = self.left.clone();
+        let mut right = self.right.clone();
+
+        left.sort_unstable();
+        right.sort_unstable();
+
+        Ok(left
+            .into_iter()
+            .zip(right.into_iter())
+            .map(|(l, r)| {
+                use std::cmp::{max, min};
+                max(l, r) - min(l, r)
+            })
+            .sum())
     }
 
     fn part2(&self) -> anyhow::Result<u64> {
