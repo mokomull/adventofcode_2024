@@ -59,6 +59,10 @@ fn is_safe(levels: &[u64]) -> bool {
             return false;
         }
 
+        if i == last {
+            return false;
+        }
+
         let this_direction = i.cmp(&last);
         match direction {
             Some(x) if x != this_direction => {
