@@ -28,7 +28,25 @@ impl Day for Solution {
     }
 
     fn part2(&self) -> anyhow::Result<u64> {
-        todo!()
+        Ok(self
+            .levels
+            .iter()
+            .filter(|&levels| -> bool {
+                if is_safe(levels) {
+                    return true;
+                }
+
+                for i in 0..levels.len() {
+                    let mut test_level = levels.clone();
+                    test_level.remove(i);
+                    if is_safe(&test_level) {
+                        return true;
+                    }
+                }
+
+                false
+            })
+            .count() as u64)
     }
 }
 
@@ -38,6 +56,10 @@ fn is_safe(levels: &[u64]) -> bool {
 
     for &i in &levels[1..] {
         if max(i, last) - min(i, last) > 3 {
+            return false;
+        }
+
+        if i == last {
             return false;
         }
 
