@@ -31,7 +31,7 @@ impl Day for Solution {
 
         Ok(left
             .into_iter()
-            .zip(right.into_iter())
+            .zip(right)
             .map(|(l, r)| {
                 use std::cmp::{max, min};
                 max(l, r) - min(l, r)
