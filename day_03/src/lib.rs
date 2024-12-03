@@ -34,49 +34,50 @@ impl Day for Solution {
         let do_regex = Regex::new(r"do\(\)").unwrap();
         let dont_regex = Regex::new(r"don't\(\)").unwrap();
 
-        Ok(self
-            .lines
-            .iter()
-            .flat_map(|line| {
-                let dos = do_regex.find_iter(line).map(|m| m.start());
-                let donts = dont_regex.find_iter(line).map(|m| m.start());
+        let data = self.lines.iter().join("\n");
 
-                let mut do_or_dont = dos
-                    .map(|i| (i, true))
-                    .chain(donts.map(|i| (i, false)))
-                    .collect_vec();
-                do_or_dont.sort_unstable();
+        let dos = do_regex.find_iter(&data).map(|m| m.start());
+        let donts = dont_regex.find_iter(&data).map(|m| m.end());
 
-                let mut ranges = Vec::new();
-                let mut last_start = 0;
-                let mut last_do = true;
-                for (pos, is_do) in do_or_dont {
-                    match (last_do, is_do) {
-                        // if we receive the same instruction, just ignore it.
-                        (true, true) | (false, false) => {}
-                        // was do, but now we should don't
-                        (true, false) => {
-                            ranges.push(last_start..pos);
-                        }
-                        // was don't, but now we should do... record the start of this range
-                        (false, true) => {
-                            last_start = pos;
-                        }
-                    }
+        let mut do_or_dont = dos
+            .map(|i| (i, true))
+            .chain(donts.map(|i| (i, false)))
+            .collect_vec();
+        do_or_dont.sort_unstable();
 
-                    last_do = is_do;
+        let mut ranges = Vec::new();
+        let mut last_start = 0;
+        let mut last_do = true;
+        for (pos, is_do) in do_or_dont {
+            match (last_do, is_do) {
+                // if we receive the same instruction, just ignore it.
+                (true, true) | (false, false) => {}
+                // was do, but now we should don't
+                (true, false) => {
+                    dbg!((last_start, pos));
+                    dbg!(&data[last_start..pos]);
+                    ranges.push(last_start..pos);
                 }
-
-                // and if we ended with a `do`, also add that to ranges
-                if last_do {
-                    ranges.push(last_start..line.len());
+                // was don't, but now we should do... record the start of this range
+                (false, true) => {
+                    last_start = pos;
                 }
+            }
 
-                ranges.into_iter().flat_map(|idxs| {
-                    mul_regex.captures_iter(&line[idxs]).map(|c| {
-                        c.get(1).unwrap().as_str().parse::<u64>().unwrap()
-                            * c.get(2).unwrap().as_str().parse::<u64>().unwrap()
-                    })
+            last_do = is_do;
+        }
+
+        // and if we ended with a `do`, also add that to ranges
+        if last_do {
+            ranges.push(last_start..data.len());
+        }
+
+        Ok(ranges
+            .into_iter()
+            .flat_map(|idxs| {
+                mul_regex.captures_iter(&data[idxs]).map(|c| {
+                    c.get(1).unwrap().as_str().parse::<u64>().unwrap()
+                        * c.get(2).unwrap().as_str().parse::<u64>().unwrap()
                 })
             })
             .sum())
