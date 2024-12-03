@@ -47,30 +47,28 @@ impl Day for Solution {
                 do_or_dont.sort_unstable();
 
                 let mut ranges = Vec::new();
-                let mut last_idx = 0;
+                let mut last_start = 0;
                 let mut last_do = true;
                 for (pos, is_do) in do_or_dont {
                     match (last_do, is_do) {
-                        // if we receive the same instruction, just ignore it.  don't even store the
-                        // current index, just completely pretend this never happened.
-                        (true, true) | (false, false) => {
-                            continue;
-                        }
+                        // if we receive the same instruction, just ignore it.
+                        (true, true) | (false, false) => {}
                         // was do, but now we should don't
                         (true, false) => {
-                            ranges.push(last_idx..pos);
+                            ranges.push(last_start..pos);
                         }
                         // was don't, but now we should do... just fall through
-                        (false, true) => {}
+                        (false, true) => {
+                            last_start = pos;
+                        }
                     }
 
-                    last_idx = pos;
                     last_do = is_do;
                 }
 
                 // and if we ended with a `do`, also add that to ranges
                 if last_do {
-                    ranges.push(last_idx..line.len());
+                    ranges.push(last_start..line.len());
                 }
 
                 ranges.into_iter().flat_map(|idxs| {
