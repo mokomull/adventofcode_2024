@@ -68,6 +68,11 @@ impl Day for Solution {
                     last_do = is_do;
                 }
 
+                // and if we ended with a `do`, also add that to ranges
+                if last_do {
+                    ranges.push(last_idx..line.len());
+                }
+
                 ranges.into_iter().flat_map(|idxs| {
                     mul_regex.captures_iter(&line[idxs]).map(|c| {
                         c.get(1).unwrap().as_str().parse::<u64>().unwrap()
