@@ -1,3 +1,4 @@
+use log::debug;
 use prelude::*;
 
 #[cfg(test)]
@@ -57,7 +58,7 @@ impl Day for Solution {
                         (true, false) => {
                             ranges.push(last_start..pos);
                         }
-                        // was don't, but now we should do... just fall through
+                        // was don't, but now we should do... record the start of this range
                         (false, true) => {
                             last_start = pos;
                         }
