@@ -28,4 +28,5 @@ MXMXAXMASX
     );
 
     assert_eq!(18, solution.part1().unwrap());
+    assert_eq!(9, solution.part2().unwrap());
 }
