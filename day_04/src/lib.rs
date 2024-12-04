@@ -24,8 +24,8 @@ impl Day for Solution {
     fn part1(&self) -> anyhow::Result<u64> {
         let mut count = 0;
 
-        'x: for &(x_i, x_j) in self.loc.get(&b'X').ok_or_else(|| anyhow!("no Xes found"))? {
-            for (di, dj) in [
+        for &(x_i, x_j) in self.loc.get(&b'X').ok_or_else(|| anyhow!("no Xes found"))? {
+            'next_direction: for (di, dj) in [
                 (1, 0),
                 (1, 1),
                 (0, 1),
@@ -55,7 +55,7 @@ impl Day for Solution {
                             (di, dj),
                             (i, j)
                         );
-                        continue 'x;
+                        continue 'next_direction;
                     }
                 }
 
