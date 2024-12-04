@@ -67,6 +67,32 @@ impl Day for Solution {
     }
 
     fn part2(&self) -> anyhow::Result<u64> {
-        todo!()
+        let mut count = 0;
+
+        let a_s = self.loc.get(&b'A').ok_or_else(|| anyhow!("no A's found"))?;
+        let m_s = self.loc.get(&b'M').ok_or_else(|| anyhow!("no M's found"))?;
+        let s_s = self.loc.get(&b'S').ok_or_else(|| anyhow!("no S's found"))?;
+
+        for (a_i, a_j) in a_s {
+            let mut count_at_this_a = 0;
+
+            for (di, dj) in [(1, 1), (1, -1), (-1, 1), (-1, -1)] {
+                // M and S must be in opposite directions from the A.
+                let m_i = a_i + di;
+                let s_i = a_i - di;
+                let m_j = a_j + dj;
+                let s_j = a_j - dj;
+
+                if m_s.contains(&(m_i, m_j)) && s_s.contains(&(s_i, s_j)) {
+                    count_at_this_a += 1;
+                }
+            }
+
+            if count_at_this_a == 2 {
+                count += 1;
+            }
+        }
+
+        Ok(count)
     }
 }
