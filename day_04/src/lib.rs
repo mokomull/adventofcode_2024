@@ -1,3 +1,4 @@
+use anyhow::bail;
 use prelude::anyhow::anyhow;
 use prelude::*;
 
@@ -37,15 +38,23 @@ impl Day for Solution {
                 let mut i = x_i;
                 let mut j = x_j;
 
+                eprintln!("found X at {:?}", (x_i, x_j));
+
                 for letter in b"MAS" {
                     i += di;
                     j += dj;
 
                     let Some(letter_loc) = self.loc.get(letter) else {
-                        continue 'x;
+                        bail!("wow, no {}s anywhere at all", letter);
                     };
 
                     if !letter_loc.contains(&(i, j)) {
+                        eprintln!(
+                            "looking for {} in direction {:?}; didn't find at {:?}",
+                            letter,
+                            (di, dj),
+                            (i, j)
+                        );
                         continue 'x;
                     }
                 }
