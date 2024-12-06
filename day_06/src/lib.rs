@@ -8,6 +8,8 @@ mod test;
 #[derive(Debug)]
 struct CycleError();
 
+type Point = (i32, i32);
+
 impl Display for CycleError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str("cycle detected")
@@ -55,6 +57,38 @@ impl Day for Solution {
     }
 
     fn part1(&self) -> anyhow::Result<u64> {
+        Ok(uniqueify(self.visit_path()?).len() as u64)
+    }
+
+    fn part2(&self) -> anyhow::Result<u64> {
+        let mut count = 0;
+        let normally_visited = uniqueify(self.visit_path()?);
+
+        for i in 0..self.height {
+            for j in 0..self.width {
+                if !normally_visited.contains(&(i, j)) {
+                    // we wouldn't even hit this location in the normal walking path, so the path is
+                    // completely unchanged by putting an obstacle here.
+                    continue;
+                }
+
+                let mut new_map = self.clone();
+                new_map.obstacles.insert((i, j));
+
+                match new_map.part1() {
+                    Err(e) if e.is::<CycleError>() => {
+                        count += 1;
+                    }
+                    _ => (),
+                }
+            }
+        }
+        Ok(count)
+    }
+}
+
+impl Solution {
+    fn visit_path(&self) -> anyhow::Result<HashSet<(Point, Point)>> {
         let mut visited = HashSet::new();
         let mut direction = (-1, 0);
         let mut location = self.start;
@@ -89,29 +123,13 @@ impl Day for Solution {
             location = next;
         }
 
-        Ok(visited
-            .into_iter()
-            .map(|(location, _direction)| location)
-            .collect::<HashSet<_>>()
-            .len() as u64)
+        Ok(visited)
     }
+}
 
-    fn part2(&self) -> anyhow::Result<u64> {
-        let mut count = 0;
-
-        for i in 0..self.height {
-            for j in 0..self.width {
-                let mut new_map = self.clone();
-                new_map.obstacles.insert((i, j));
-
-                match new_map.part1() {
-                    Err(e) if e.is::<CycleError>() => {
-                        count += 1;
-                    }
-                    _ => (),
-                }
-            }
-        }
-        Ok(count)
-    }
+fn uniqueify(visited: HashSet<(Point, Point)>) -> HashSet<Point> {
+    visited
+        .into_iter()
+        .map(|(location, _direction)| location)
+        .collect()
 }
