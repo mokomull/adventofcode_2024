@@ -64,22 +64,29 @@ impl Day for Solution {
                 return Err(anyhow::Error::from(CycleError()));
             }
 
-            let next = (location.0 + direction.0, location.1 + direction.1);
+            let mut next = (location.0 + direction.0, location.1 + direction.1);
             if self.obstacles.contains(&next) {
-                direction = match direction {
-                    (-1, 0) => (0, 1),
-                    (0, 1) => (1, 0),
-                    (1, 0) => (0, -1),
-                    (0, -1) => (-1, 0),
-                    x => panic!("direction unexpected: {:?}", x),
-                };
-                location = (location.0 + direction.0, location.1 + direction.1);
-                if self.obstacles.contains(&location) {
-                    anyhow::bail!("we turned, and we still hit an obstacle");
+                let mut turns = 0;
+
+                while self.obstacles.contains(&next) && turns < 4 {
+                    direction = match direction {
+                        (-1, 0) => (0, 1),
+                        (0, 1) => (1, 0),
+                        (1, 0) => (0, -1),
+                        (0, -1) => (-1, 0),
+                        x => panic!("direction unexpected: {:?}", x),
+                    };
+                    next = (location.0 + direction.0, location.1 + direction.1);
+                    turns += 1;
                 }
-            } else {
-                location = next;
+                if turns >= 4 {
+                    anyhow::bail!(
+                        "we turned four times, and kept hitting an obstacle; nowhere to go"
+                    );
+                }
             }
+
+            location = next;
         }
 
         Ok(visited
