@@ -41,7 +41,32 @@ impl Day for Solution {
     }
 
     fn part1(&self) -> anyhow::Result<u64> {
-        todo!()
+        let mut visited = HashSet::new();
+        let mut direction = (-1, 0);
+        let mut location = self.start;
+
+        while (0..self.height).contains(&location.0) && (0..self.width).contains(&location.1) {
+            visited.insert(location);
+
+            let next = (location.0 + direction.0, location.1 + direction.1);
+            if self.obstacles.contains(&next) {
+                direction = match direction {
+                    (-1, 0) => (0, 1),
+                    (0, 1) => (1, 0),
+                    (1, 0) => (0, -1),
+                    (0, -1) => (-1, 0),
+                    x => panic!("direction unexpected: {:?}", x),
+                };
+                location = (location.0 + direction.0, location.1 + direction.1);
+                if self.obstacles.contains(&location) {
+                    anyhow::bail!("we turned, and we still hit an obstacle");
+                }
+            } else {
+                location = next;
+            }
+        }
+
+        Ok(visited.len() as u64)
     }
 
     fn part2(&self) -> anyhow::Result<u64> {
