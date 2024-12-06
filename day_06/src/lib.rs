@@ -1,8 +1,22 @@
+use std::fmt::Display;
+
 use prelude::*;
 
 #[cfg(test)]
 mod test;
 
+#[derive(Debug)]
+struct CycleError();
+
+impl Display for CycleError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("cycle detected")
+    }
+}
+
+impl std::error::Error for CycleError {}
+
+#[derive(Clone)]
 pub struct Solution {
     obstacles: HashSet<(i32, i32)>,
     height: i32,
@@ -46,30 +60,58 @@ impl Day for Solution {
         let mut location = self.start;
 
         while (0..self.height).contains(&location.0) && (0..self.width).contains(&location.1) {
-            visited.insert(location);
-
-            let next = (location.0 + direction.0, location.1 + direction.1);
-            if self.obstacles.contains(&next) {
-                direction = match direction {
-                    (-1, 0) => (0, 1),
-                    (0, 1) => (1, 0),
-                    (1, 0) => (0, -1),
-                    (0, -1) => (-1, 0),
-                    x => panic!("direction unexpected: {:?}", x),
-                };
-                location = (location.0 + direction.0, location.1 + direction.1);
-                if self.obstacles.contains(&location) {
-                    anyhow::bail!("we turned, and we still hit an obstacle");
-                }
-            } else {
-                location = next;
+            if !visited.insert((location, direction)) {
+                return Err(anyhow::Error::from(CycleError()));
             }
+
+            let mut next = (location.0 + direction.0, location.1 + direction.1);
+            if self.obstacles.contains(&next) {
+                let mut turns = 0;
+
+                while self.obstacles.contains(&next) && turns < 4 {
+                    direction = match direction {
+                        (-1, 0) => (0, 1),
+                        (0, 1) => (1, 0),
+                        (1, 0) => (0, -1),
+                        (0, -1) => (-1, 0),
+                        x => panic!("direction unexpected: {:?}", x),
+                    };
+                    next = (location.0 + direction.0, location.1 + direction.1);
+                    turns += 1;
+                }
+                if turns >= 4 {
+                    anyhow::bail!(
+                        "we turned four times, and kept hitting an obstacle; nowhere to go"
+                    );
+                }
+            }
+
+            location = next;
         }
 
-        Ok(visited.len() as u64)
+        Ok(visited
+            .into_iter()
+            .map(|(location, _direction)| location)
+            .collect::<HashSet<_>>()
+            .len() as u64)
     }
 
     fn part2(&self) -> anyhow::Result<u64> {
-        todo!()
+        let mut count = 0;
+
+        for i in 0..self.height {
+            for j in 0..self.width {
+                let mut new_map = self.clone();
+                new_map.obstacles.insert((i, j));
+
+                match new_map.part1() {
+                    Err(e) if e.is::<CycleError>() => {
+                        count += 1;
+                    }
+                    _ => (),
+                }
+            }
+        }
+        Ok(count)
     }
 }
