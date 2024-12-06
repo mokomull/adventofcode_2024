@@ -46,7 +46,9 @@ impl Day for Solution {
         let mut location = self.start;
 
         while (0..self.height).contains(&location.0) && (0..self.width).contains(&location.1) {
-            visited.insert(location);
+            if !visited.insert((location, direction)) {
+                anyhow::bail!("cycle detected");
+            }
 
             let next = (location.0 + direction.0, location.1 + direction.1);
             if self.obstacles.contains(&next) {
@@ -66,7 +68,11 @@ impl Day for Solution {
             }
         }
 
-        Ok(visited.len() as u64)
+        Ok(visited
+            .into_iter()
+            .map(|(location, _direction)| location)
+            .collect::<HashSet<_>>()
+            .len() as u64)
     }
 
     fn part2(&self) -> anyhow::Result<u64> {
