@@ -1,7 +1,7 @@
 use crate::Solution;
 use prelude::Day;
 
-static INPUT: &str = "";
+static INPUT: &str = include_str!("input.txt");
 
 #[test]
 fn day_06() {
