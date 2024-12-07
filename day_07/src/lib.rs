@@ -41,8 +41,8 @@ impl Day for Solution {
 
             dbg!((target, values));
 
-            let mut accumulator = values[0];
             for operators in 0..(1 << (values.len())) {
+                let mut accumulator = values[0];
                 dbg!(operators);
                 for (idx, &value) in values[1..].iter().enumerate() {
                     if operators & (1 << idx) > 0 {
