@@ -32,27 +32,9 @@ impl Day for Solution {
     fn part1(&self) -> anyhow::Result<u64> {
         let mut total = 0;
 
-        'equation: for (target, values) in &self.equations {
-            // use bits starting at the bottom (ones) to represent add (0) or multiply (1)
-            if values.len() > 12 {
-                // making more than 2^11 decisions is going to take too long
-                anyhow::bail!("too many values: {}: {:?}", target, values);
-            }
-
-            for operators in 0..(1 << (values.len() - 1)) {
-                let mut accumulator = values[0];
-                for (idx, &value) in values[1..].iter().enumerate() {
-                    if operators & (1 << idx) > 0 {
-                        accumulator *= value
-                    } else {
-                        accumulator += value
-                    }
-                }
-
-                if accumulator == *target {
-                    total += accumulator;
-                    continue 'equation;
-                }
+        for (target, values) in &self.equations {
+            if all_evaluations(values).contains(target) {
+                total += target;
             }
         }
 
@@ -62,4 +44,25 @@ impl Day for Solution {
     fn part2(&self) -> anyhow::Result<u64> {
         todo!()
     }
+}
+
+fn all_evaluations<'a>(values: &'a [i64]) -> impl Iterator<Item = i64> + 'a {
+    // use bits starting at the bottom (ones) to represent add (0) or multiply (1)
+    if values.len() > 12 {
+        // making more than 2^11 decisions is going to take too long
+        panic!("too many values: {:?}", values);
+    }
+
+    (0..(1 << (values.len() - 1))).into_iter().map(|operators| {
+        let mut accumulator: i64 = values[0];
+        for (idx, &value) in values[1..].iter().enumerate() {
+            if operators & (1 << idx) > 0 {
+                accumulator *= value
+            } else {
+                accumulator += value
+            }
+        }
+
+        accumulator
+    })
 }
