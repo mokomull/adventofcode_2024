@@ -25,4 +25,5 @@ fn example() {
 292: 11 6 16 20",
     );
     assert_eq!(3749, solution.part1().unwrap());
+    assert_eq!(11387, solution.part2().unwrap());
 }
