@@ -39,21 +39,31 @@ impl Day for Solution {
                 anyhow::bail!("too many values: {}: {:?}", target, values);
             }
 
+            dbg!((target, values));
+
             let mut accumulator = values[0];
-            for operators in 0..(1 << (values.len() - 1)) {
+            for operators in 0..(1 << (values.len())) {
+                dbg!(operators);
                 for (idx, &value) in values[1..].iter().enumerate() {
                     if operators & (1 << idx) > 0 {
+                        eprintln!("multiplying by {}", value);
                         accumulator *= value
                     } else {
+                        eprintln!("adding {}", value);
                         accumulator += value
                     }
                 }
 
+                dbg!(accumulator);
+
                 if accumulator == *target {
+                    eprintln!("found target with operators {operators}");
                     total += accumulator;
                     continue 'equation;
                 }
             }
+
+            eprintln!("did not find target at all...");
         }
 
         Ok(total as u64)
