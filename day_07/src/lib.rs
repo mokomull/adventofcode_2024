@@ -30,7 +30,33 @@ impl Day for Solution {
     }
 
     fn part1(&self) -> anyhow::Result<u64> {
-        todo!()
+        let mut total = 0;
+
+        'equation: for (target, values) in &self.equations {
+            // use bits starting at the bottom (ones) to represent add (0) or multiply (1)
+            if values.len() > 12 {
+                // making more than 2^11 decisions is going to take too long
+                anyhow::bail!("too many values: {}: {:?}", target, values);
+            }
+
+            let mut accumulator = values[0];
+            for operators in 0..(1 << (values.len() - 1)) {
+                for (idx, &value) in values[1..].iter().enumerate() {
+                    if operators & (1 << idx) > 0 {
+                        accumulator *= value
+                    } else {
+                        accumulator += value
+                    }
+                }
+
+                if accumulator == *target {
+                    total += accumulator;
+                    continue 'equation;
+                }
+            }
+        }
+
+        Ok(total as u64)
     }
 
     fn part2(&self) -> anyhow::Result<u64> {
