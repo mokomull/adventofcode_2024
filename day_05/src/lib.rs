@@ -5,7 +5,7 @@ use prelude::*;
 
 struct Solution {
     rules: HashMap<usize, HashSet<usize>>,
-    pages: Vec<Vec<usize>>,
+    updates: Vec<Vec<usize>>,
 }
 
 impl Day for Solution {
@@ -25,20 +25,38 @@ impl Day for Solution {
             rules.entry(before).or_default().insert(after);
         }
 
-        let mut pages = Vec::new();
+        let mut updates = Vec::new();
         for line in lines {
-            pages.push(
+            updates.push(
                 line.split(',')
                     .map(|s| s.parse().expect("bad integer in pages"))
                     .collect_vec(),
             );
         }
 
-        Self { rules, pages }
+        Self { rules, updates }
     }
 
     fn part1(&self) -> anyhow::Result<u64> {
-        todo!()
+        let mut total = 0;
+
+        'update: for pages in &self.updates {
+            for (i, page) in pages.iter().enumerate() {
+                for earlier_page in &pages[..i] {
+                    if let Some(must_be_after) = self.rules.get(page) {
+                        if must_be_after.contains(earlier_page) {
+                            // this update is out-of order
+                            continue 'update;
+                        }
+                    }
+                }
+            }
+
+            // we went through all the pages and there aren't any mis-ordered ones
+            total += pages[pages.len() / 2];
+        }
+
+        Ok(total as u64)
     }
 
     fn part2(&self) -> anyhow::Result<u64> {
