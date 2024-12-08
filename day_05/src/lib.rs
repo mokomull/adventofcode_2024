@@ -60,6 +60,46 @@ impl Day for Solution {
     }
 
     fn part2(&self) -> anyhow::Result<u64> {
-        todo!()
+        let mut out_of_order = Vec::new();
+
+        'update: for pages in &self.updates {
+            for (i, page) in pages.iter().enumerate() {
+                for earlier_page in &pages[..i] {
+                    if let Some(must_be_after) = self.rules.get(page) {
+                        if must_be_after.contains(earlier_page) {
+                            // this update is out-of order
+                            out_of_order.push(pages);
+                            continue 'update;
+                        }
+                    }
+                }
+            }
+        }
+
+        let mut total = 0;
+
+        for update in out_of_order {
+            let mut update = update.clone();
+
+            'again: loop {
+                for i in 0..update.len() {
+                    for earlier_page in 0..i {
+                        if let Some(must_be_after) = self.rules.get(&update[i]) {
+                            if must_be_after.contains(&update[earlier_page]) {
+                                // naive but ... can we get away with just swapping them?
+                                update.swap(i, earlier_page);
+                                continue 'again;
+                            }
+                        }
+                    }
+                }
+
+                // if we didn't find anything out of order, then we're all set!
+                total += update[update.len() / 2];
+                break;
+            }
+        }
+
+        Ok(total as u64)
     }
 }
