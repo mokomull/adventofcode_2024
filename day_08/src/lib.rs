@@ -61,7 +61,27 @@ impl Day for Solution {
     }
 
     fn part2(&self) -> anyhow::Result<u64> {
-        todo!()
+        let mut antinodes = HashSet::new();
+
+        for i in 0..self.height {
+            for j in 0..self.width {
+                for (_frequency, locations) in self.antennas.iter() {
+                    for (p, q) in locations.iter().cartesian_product(locations.iter()) {
+                        if p == q {
+                            continue;
+                        }
+
+                        let location = (i, j);
+
+                        if colinear(location, *p, *q) {
+                            antinodes.insert((i, j));
+                        }
+                    }
+                }
+            }
+        }
+
+        Ok(antinodes.len() as u64)
     }
 }
 
