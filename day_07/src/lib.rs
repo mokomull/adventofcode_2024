@@ -39,7 +39,13 @@ impl Day for Solution {
                 anyhow::bail!("too many values: {}: {:?}", target, values);
             }
 
-            for accumulator in all_options(values[0], &values[1..], &[|a, b| a + b, |a, b| a * b]) {
+            for accumulator in all_options(
+                values[0],
+                // TODO: all_options needs to grow its 'a lifetime parameter again, but I don't
+                // immediately see how to teach rustc that the Box really doesn't outlive 'a.
+                unsafe { std::mem::transmute(&values[1..]) },
+                &[|a, b| a + b, |a, b| a * b],
+            ) {
                 if accumulator == *target {
                     total += accumulator;
                     continue 'equation;
@@ -97,11 +103,11 @@ impl Day for Solution {
     }
 }
 
-fn all_options<'a>(
+fn all_options(
     first: i64,
-    rest: &'a [i64],
-    operators: &'a [fn(i64, i64) -> i64],
-) -> impl Iterator<Item = i64> + 'a {
+    rest: &'static [i64],
+    operators: &'static [fn(i64, i64) -> i64],
+) -> impl Iterator<Item = i64> {
     enum State {
         Done,
         One(i64),
@@ -123,13 +129,10 @@ fn all_options<'a>(
             state = State::Done;
             Some(i)
         }
-        State::PassingDown(mut it) => match it.next() {
-            Some(i) => {
-                state = State::PassingDown(it);
-                Some(i)
-            }
+        State::PassingDown(ref mut it) => match it.next() {
+            Some(i) => Some(i),
             None => {
-                if operators.is_empty() {
+                if remaining_operators.is_empty() {
                     state = State::Done;
                     return None;
                 }
