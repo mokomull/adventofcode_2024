@@ -45,7 +45,11 @@ impl Day for Solution {
 
                         let location = (i, j);
 
-                        if distance_squared(location, *p) == distance_squared(location, *q) {
+                        if !colinear(location, *p, *q) {
+                            continue;
+                        }
+
+                        if distance_squared(location, *p) == 4 * distance_squared(location, *q) {
                             antinodes.insert((i, j));
                         }
                     }
@@ -67,4 +71,21 @@ fn distance_squared(a: (usize, usize), b: (usize, usize)) -> usize {
     let dy = max(a.1, b.1) - min(a.1, b.1);
 
     dx * dx + dy * dy
+}
+
+fn colinear(a: (usize, usize), b: (usize, usize), c: (usize, usize)) -> bool {
+    use rational::Rational;
+
+    // don't even do math if they're all in a vertical line
+    if a.1 == b.1 && b.1 == c.1 {
+        return true;
+    } else if a.1 == b.1 || b.1 == c.1 {
+        // two of them are in a vertical line, but the third isn't.
+        return false;
+    }
+
+    let ab = Rational::new(b.0 as i64 - a.0 as i64, b.1 as i64 - a.1 as i64);
+    let bc = Rational::new(c.0 as i64 - b.0 as i64, c.1 as i64 - b.1 as i64);
+
+    bc == ab
 }

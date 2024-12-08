@@ -96,6 +96,7 @@ name = "day_08"
 version = "0.1.0"
 dependencies = [
  "prelude 0.1.0",
+ "rational",
 ]
 
 [[package]]
@@ -202,6 +203,12 @@ checksum = "b5b9d34b8991d19d98081b46eacdd8eb58c6f2b201139f7c5f643cc155a633af"
 dependencies = [
  "proc-macro2",
 ]
+
+[[package]]
+name = "rational"
+version = "1.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "117b580236885b73c6eaf40e38c9629153f70200ac28ae35347a2cb750ce9442"
 
 [[package]]
 name = "regex"
