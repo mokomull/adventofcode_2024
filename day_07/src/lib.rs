@@ -39,7 +39,7 @@ impl Day for Solution {
                 anyhow::bail!("too many values: {}: {:?}", target, values);
             }
 
-            for accumulator in all_options(values[0], &values[1..], [|a, b| a + b, |a, b| a * b]) {
+            for accumulator in all_options(values[0], &values[1..], &[|a, b| a + b, |a, b| a * b]) {
                 if accumulator == *target {
                     total += accumulator;
                     continue 'equation;
@@ -97,23 +97,25 @@ impl Day for Solution {
     }
 }
 
-fn all_options(
+fn all_options<'a>(
     first: i64,
-    rest: &[i64],
-    mut operators: &[fn(i64, i64) -> i64],
-) -> impl Iterator<Item = i64> {
+    rest: &'a [i64],
+    operators: &'a [fn(i64, i64) -> i64],
+) -> impl Iterator<Item = i64> + 'a {
     enum State {
         Done,
         One(i64),
         PassingDown(Box<dyn Iterator<Item = i64>>),
     }
 
-    let state;
+    let mut state;
     if rest.is_empty() {
         state = State::One(first);
     } else {
         state = State::PassingDown(Box::new(std::iter::empty()));
     }
+
+    let mut remaining_operators = operators;
 
     std::iter::from_fn(move || match state {
         State::Done => None,
@@ -122,18 +124,23 @@ fn all_options(
             Some(i)
         }
         State::PassingDown(mut it) => match it.next() {
-            Some(i) => Some(i),
+            Some(i) => {
+                state = State::PassingDown(it);
+                Some(i)
+            }
             None => {
                 if operators.is_empty() {
                     state = State::Done;
                     return None;
                 }
 
-                let operator = operators[0];
-                operators = &operators[1..];
+                let operator = remaining_operators[0];
+                remaining_operators = &remaining_operators[1..];
 
                 let mut new_it = all_options(operator(first, rest[0]), &rest[1..], operators);
-                new_it.next()
+                let res = new_it.next();
+                state = State::PassingDown(Box::new(new_it));
+                res
             }
         },
     })
