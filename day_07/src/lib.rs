@@ -60,32 +60,22 @@ impl Day for Solution {
                 anyhow::bail!("too many values: {}: {:?}", target, values);
             }
 
-            for mut operators in 0u64.. {
-                let mut accumulator = values[0];
-                for &value in &values[1..] {
-                    match operators % 3 {
-                        0 => accumulator += value,
-                        1 => accumulator *= value,
-                        2 => {
-                            let mut concatenated = accumulator.to_string();
-                            concatenated.push_str(&value.to_string());
+            for accumulator in all_options(
+                values[0],
+                &values[1..],
+                &[
+                    |a, b| a + b,
+                    |a, b| a * b,
+                    |a, b| {
+                        let mut concatenated = a.to_string();
+                        concatenated.push_str(&b.to_string());
 
-                            accumulator = concatenated
-                                .parse()
-                                .expect("concatenation resulted in garbage");
-                        }
-                        _ => panic!("modulo three yielded something that wasn't 0 1 or 2"),
-                    }
-                    operators /= 3;
-                }
-
-                if operators > 0 {
-                    // we went through all the values and still have a nonzero operator left, which
-                    // means we've *previously* gone through all of the operators for the values
-                    // that we have.  Stop.
-                    break;
-                }
-
+                        concatenated
+                            .parse()
+                            .expect("concatenation resulted in garbage")
+                    },
+                ],
+            ) {
                 if accumulator == *target {
                     total += accumulator;
                     continue 'equation;
