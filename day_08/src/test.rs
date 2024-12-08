@@ -28,4 +28,5 @@ fn example() {
 ............",
     );
     assert_eq!(14, solution.part1().unwrap());
+    assert_eq!(34, solution.part2().unwrap());
 }
