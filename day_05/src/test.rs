@@ -2,7 +2,8 @@ use prelude::Day;
 
 use crate::Solution;
 
-static INPUT: &str = "";
+static INPUT: &str = include_str!("input.txt");
+
 #[test]
 fn day_05() {
     let solution = Solution::new(INPUT);
