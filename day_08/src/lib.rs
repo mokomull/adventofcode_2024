@@ -25,7 +25,7 @@ impl Day for Solution {
         let mut antinodes = HashSet::new();
 
         for (_frequency, locations) in self.antennas.iter() {
-            for (p, q) in locations.iter().tuple_combinations() {
+            for (p, q) in locations.iter().cartesian_product(locations.iter()) {
                 if p == q {
                     continue;
                 }
