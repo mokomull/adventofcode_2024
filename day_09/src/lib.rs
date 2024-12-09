@@ -64,7 +64,7 @@ impl Day for Solution {
             .flatten()
             .enumerate()
             .map(|(i, file_id)| i as u64 * file_id as u64)
-            .product())
+            .sum())
     }
 
     fn part2(&self) -> anyhow::Result<u64> {
