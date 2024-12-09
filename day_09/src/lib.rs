@@ -95,8 +95,6 @@ impl Day for Solution {
             free_blocks.insert((free_start, disk.len()));
         }
 
-        dbg!(&free_blocks);
-
         // find the first file block to move
         let mut file_end = disk.len() - 1;
         while disk[file_end].is_none() {
@@ -118,8 +116,14 @@ impl Day for Solution {
             let mut free = None;
             // find the leftmost suitable spot
             for &(start, end) in free_blocks.iter() {
+                if start >= file_start {
+                    // nowhere to put it
+                    break;
+                }
+
                 if end - start > length {
                     free = Some((start, end));
+                    break;
                 }
             }
 
