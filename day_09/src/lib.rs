@@ -130,9 +130,16 @@ impl Day for Solution {
             // find the start of that file
             file_start = file_end;
             while disk[file_start] == disk[file_end] {
+                if file_start == 0 {
+                    // don't try to read disk[-1] (which is probably undefined...)
+                    break;
+                }
                 file_start -= 1;
             }
-            file_start += 1;
+            if file_start > 0 || disk[file_start] != disk[file_end] {
+                // correct for having searched just beyond the beginning of the file.
+                file_start += 1;
+            }
         }
 
         Ok(disk
