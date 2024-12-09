@@ -61,9 +61,8 @@ impl Day for Solution {
 
         Ok(disk
             .into_iter()
-            .flatten()
             .enumerate()
-            .map(|(i, file_id)| i as u64 * file_id as u64)
+            .filter_map(|(i, file_id)| file_id.map(|file_id| i as u64 * file_id as u64))
             .sum())
     }
 
@@ -144,9 +143,8 @@ impl Day for Solution {
 
         Ok(disk
             .into_iter()
-            .flatten()
             .enumerate()
-            .map(|(i, file_id)| i as u64 * file_id as u64)
+            .filter_map(|(i, file_id)| file_id.map(|file_id| i as u64 * file_id as u64))
             .sum())
     }
 }
