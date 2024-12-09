@@ -121,7 +121,7 @@ impl Day for Solution {
                     break;
                 }
 
-                if end - start > length {
+                if end - start >= length {
                     free = Some((start, end));
                     break;
                 }
