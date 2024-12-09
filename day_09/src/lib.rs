@@ -107,6 +107,7 @@ impl Day for Solution {
                 }
 
                 free = Some(free_start..(free_start + length));
+                break;
             }
 
             // if we found a spot, move the block
