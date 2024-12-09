@@ -32,18 +32,16 @@ impl Day for Solution {
     fn part1(&self) -> anyhow::Result<u64> {
         let mut total: i64 = 0;
 
-        'equation: for (target, values) in &self.equations {
+        for (target, values) in &self.equations {
             // use bits starting at the bottom (ones) to represent add (0) or multiply (1)
             if values.len() > 12 {
                 // making more than 2^11 decisions is going to take too long
                 anyhow::bail!("too many values: {}: {:?}", target, values);
             }
 
-            for accumulator in all_options(values[0], &values[1..], &[|a, b| a + b, |a, b| a * b]) {
-                if accumulator == *target {
-                    total += accumulator;
-                    continue 'equation;
-                }
+            let results = all_options(values[0], &values[1..], &[|a, b| a + b, |a, b| a * b]);
+            if results.into_iter().contains(target) {
+                total += target;
             }
         }
 
@@ -53,14 +51,14 @@ impl Day for Solution {
     fn part2(&self) -> anyhow::Result<u64> {
         let mut total: i64 = 0;
 
-        'equation: for (target, values) in &self.equations {
+        for (target, values) in &self.equations {
             // use ternary starting at the bottom (ones) to represent add (0) or multiply (1) or concatenate (2)
             if values.len() > 12 {
                 // making more than 3^11 decisions is going to take too long
                 anyhow::bail!("too many values: {}: {:?}", target, values);
             }
 
-            for accumulator in all_options(
+            let results = all_options(
                 values[0],
                 &values[1..],
                 &[
@@ -75,11 +73,10 @@ impl Day for Solution {
                             .expect("concatenation resulted in garbage")
                     },
                 ],
-            ) {
-                if accumulator == *target {
-                    total += accumulator;
-                    continue 'equation;
-                }
+            );
+
+            if results.into_iter().contains(target) {
+                total += target;
             }
         }
 
