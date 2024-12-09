@@ -68,6 +68,77 @@ impl Day for Solution {
     }
 
     fn part2(&self) -> anyhow::Result<u64> {
-        todo!()
+        let mut disk = self.disk.clone();
+
+        // find the first file block to move
+        let mut file_end = disk.len() - 1;
+        while disk[file_end].is_none() {
+            file_end -= 1;
+        }
+        // find the start of that file
+        let mut file_start = file_end;
+        while disk[file_start] == disk[file_end] {
+            file_start -= 1;
+        }
+        file_start += 1;
+
+        loop {
+            let length = file_end - file_start + 1;
+            let file_id = disk[file_end].expect("file_end should never point to free space");
+
+            let mut free_start = 0;
+            let mut free = None;
+            // find the leftmost suitable spot
+            'find_free: loop {
+                if disk[free_start].is_some() {
+                    free_start += 1;
+                    continue;
+                }
+
+                for i in 0..length {
+                    if free_start + i > file_start {
+                        break 'find_free;
+                    }
+
+                    if disk[free_start + i].is_some() {
+                        free_start += i + 1;
+                        continue 'find_free;
+                    }
+                }
+
+                free = Some(free_start..(free_start + length));
+            }
+
+            // if we found a spot, move the block
+            if let Some(free) = free {
+                let (left, right) = disk.split_at_mut(file_start);
+                (&mut left[free]).swap_with_slice(&mut right[..length]);
+            }
+
+            // and find the next file block to move
+            if file_id == 0 {
+                // we're done once we've dispatched file 0... which, trivially, won't move.
+                break;
+            }
+
+            while disk[file_end] != Some(file_id - 1) {
+                // the next file we're moving is the one with the next-lower *id*.  We may have
+                // moved other stuff between this file and the file we seek.
+                file_end -= 1;
+            }
+            // find the start of that file
+            file_start = file_end;
+            while disk[file_start] == disk[file_end] {
+                file_start -= 1;
+            }
+            file_start += 1;
+        }
+
+        Ok(disk
+            .into_iter()
+            .flatten()
+            .enumerate()
+            .map(|(i, file_id)| i as u64 * file_id as u64)
+            .sum())
     }
 }
