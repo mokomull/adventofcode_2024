@@ -32,27 +32,16 @@ impl Day for Solution {
     fn part1(&self) -> anyhow::Result<u64> {
         let mut total: i64 = 0;
 
-        'equation: for (target, values) in &self.equations {
+        for (target, values) in &self.equations {
             // use bits starting at the bottom (ones) to represent add (0) or multiply (1)
             if values.len() > 12 {
                 // making more than 2^11 decisions is going to take too long
                 anyhow::bail!("too many values: {}: {:?}", target, values);
             }
 
-            for operators in 0..(1 << (values.len() - 1)) {
-                let mut accumulator = values[0];
-                for (idx, &value) in values[1..].iter().enumerate() {
-                    if operators & (1 << idx) > 0 {
-                        accumulator *= value
-                    } else {
-                        accumulator += value
-                    }
-                }
-
-                if accumulator == *target {
-                    total += accumulator;
-                    continue 'equation;
-                }
+            let results = all_options(values[0], &values[1..], &[|a, b| a + b, |a, b| a * b]);
+            if results.into_iter().contains(target) {
+                total += target;
             }
         }
 
@@ -62,46 +51,51 @@ impl Day for Solution {
     fn part2(&self) -> anyhow::Result<u64> {
         let mut total: i64 = 0;
 
-        'equation: for (target, values) in &self.equations {
+        for (target, values) in &self.equations {
             // use ternary starting at the bottom (ones) to represent add (0) or multiply (1) or concatenate (2)
             if values.len() > 12 {
                 // making more than 3^11 decisions is going to take too long
                 anyhow::bail!("too many values: {}: {:?}", target, values);
             }
 
-            for mut operators in 0u64.. {
-                let mut accumulator = values[0];
-                for &value in &values[1..] {
-                    match operators % 3 {
-                        0 => accumulator += value,
-                        1 => accumulator *= value,
-                        2 => {
-                            let mut concatenated = accumulator.to_string();
-                            concatenated.push_str(&value.to_string());
+            let results = all_options(
+                values[0],
+                &values[1..],
+                &[
+                    |a, b| a + b,
+                    |a, b| a * b,
+                    |a, b| {
+                        let mut concatenated = a.to_string();
+                        concatenated.push_str(&b.to_string());
 
-                            accumulator = concatenated
-                                .parse()
-                                .expect("concatenation resulted in garbage");
-                        }
-                        _ => panic!("modulo three yielded something that wasn't 0 1 or 2"),
-                    }
-                    operators /= 3;
-                }
+                        concatenated
+                            .parse()
+                            .expect("concatenation resulted in garbage")
+                    },
+                ],
+            );
 
-                if operators > 0 {
-                    // we went through all the values and still have a nonzero operator left, which
-                    // means we've *previously* gone through all of the operators for the values
-                    // that we have.  Stop.
-                    break;
-                }
-
-                if accumulator == *target {
-                    total += accumulator;
-                    continue 'equation;
-                }
+            if results.into_iter().contains(target) {
+                total += target;
             }
         }
 
         Ok(total as u64)
     }
+}
+
+fn all_options<'a>(
+    first: i64,
+    rest: &'a [i64],
+    operators: &'a [fn(i64, i64) -> i64],
+) -> Box<dyn Iterator<Item = i64> + 'a> {
+    if rest.is_empty() {
+        return Box::new(std::iter::once(first));
+    }
+
+    Box::new(
+        operators
+            .iter()
+            .flat_map(move |operator| all_options(operator(first, rest[0]), &rest[1..], operators)),
+    )
 }
