@@ -91,44 +91,14 @@ fn all_options<'a>(
     first: i64,
     rest: &'a [i64],
     operators: &'a [fn(i64, i64) -> i64],
-) -> impl Iterator<Item = i64> + 'a {
-    enum State<'s> {
-        Done,
-        One(i64),
-        PassingDown(Box<dyn Iterator<Item = i64> + 's>),
-    }
-
-    let mut state;
+) -> Box<dyn Iterator<Item = i64> + 'a> {
     if rest.is_empty() {
-        state = State::One(first);
-    } else {
-        state = State::PassingDown(Box::new(std::iter::empty()));
+        return Box::new(std::iter::once(first));
     }
 
-    let mut remaining_operators = operators;
-
-    std::iter::from_fn(move || match state {
-        State::Done => None,
-        State::One(i) => {
-            state = State::Done;
-            Some(i)
-        }
-        State::PassingDown(ref mut it) => match it.next() {
-            Some(i) => Some(i),
-            None => {
-                if remaining_operators.is_empty() {
-                    state = State::Done;
-                    return None;
-                }
-
-                let operator = remaining_operators[0];
-                remaining_operators = &remaining_operators[1..];
-
-                let mut new_it = all_options(operator(first, rest[0]), &rest[1..], operators);
-                let res = new_it.next();
-                state = State::PassingDown(Box::new(new_it));
-                res
-            }
-        },
-    })
+    Box::new(
+        operators
+            .iter()
+            .flat_map(move |operator| all_options(operator(first, rest[0]), &rest[1..], operators)),
+    )
 }
