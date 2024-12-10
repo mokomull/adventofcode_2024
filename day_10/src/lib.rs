@@ -2,10 +2,11 @@
 mod test;
 
 use petgraph::{
-    algo::{all_simple_paths, floyd_warshall},
+    algo::{all_simple_paths, dijkstra},
     visit::{
-        Data, GraphBase, GraphProp, IntoEdgeReferences, IntoNeighbors, IntoNeighborsDirected,
-        IntoNodeIdentifiers, NodeCompactIndexable, NodeCount, NodeIndexable,
+        Data, GraphBase, GraphProp, IntoEdgeReferences, IntoEdges, IntoNeighbors,
+        IntoNeighborsDirected, IntoNodeIdentifiers, NodeCompactIndexable, NodeCount, NodeIndexable,
+        Visitable,
     },
     Directed,
     Direction::{self, Incoming, Outgoing},
@@ -26,9 +27,6 @@ impl Day for Solution {
     }
 
     fn part1(&self) -> anyhow::Result<u64> {
-        let all_pairs =
-            floyd_warshall(&self, |_| 1_u32).expect("no negative weights in the first place");
-
         let mut possible_trailheads = Vec::new();
         let mut peaks = Vec::new();
 
@@ -48,9 +46,10 @@ impl Day for Solution {
         Ok(possible_trailheads
             .into_iter()
             .map(|trailhead| {
+                let reachable = dijkstra(&self, trailhead, None, |_| 1u32);
                 let count = peaks
                     .iter()
-                    .filter(|&&peak| match all_pairs.get(&(trailhead, peak)) {
+                    .filter(|&peak| match reachable.get(peak) {
                         None | Some(&u32::MAX) => false,
                         _ => true,
                     })
@@ -100,6 +99,18 @@ impl GraphProp for Solution {
     type EdgeType = Directed;
 }
 
+impl Visitable for Solution {
+    type Map = HashSet<Self::NodeId>;
+
+    fn visit_map(self: &Self) -> Self::Map {
+        HashSet::new()
+    }
+
+    fn reset_map(self: &Self, map: &mut Self::Map) {
+        map.clear();
+    }
+}
+
 impl<'a> IntoNodeIdentifiers for &'a Solution {
     type NodeIdentifiers = Box<dyn Iterator<Item = (usize, usize)> + 'a>;
 
@@ -139,8 +150,16 @@ impl<'a> IntoEdgeReferences for &'a Solution {
     fn edge_references(self) -> Self::EdgeReferences {
         Box::new(
             self.node_identifiers()
-                .flat_map(|(i, j)| self.neighbors((i, j)).map(move |next| ((i, j), next, &()))),
+                .flat_map(|(i, j)| self.edges((i, j))),
         )
+    }
+}
+
+impl<'a> IntoEdges for &'a Solution {
+    type Edges = Box<dyn Iterator<Item = Self::EdgeRef> + 'a>;
+
+    fn edges(self, (i, j): Self::NodeId) -> Self::Edges {
+        Box::new(self.neighbors((i, j)).map(move |next| ((i, j), next, &())))
     }
 }
 
