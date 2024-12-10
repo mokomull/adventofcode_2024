@@ -76,6 +76,7 @@ impl Day for Solution {
         let mut free_blocks = BTreeSet::new();
         let mut last_seen_free = false;
         let mut free_start = 0;
+        #[allow(clippy::needless_range_loop)]
         for i in 0..disk.len() {
             match (last_seen_free, disk[i].is_none()) {
                 (true, true) | (false, false) => {
@@ -130,7 +131,7 @@ impl Day for Solution {
             // if we found a spot, move the block and account for our free space
             if let Some((start, end)) = free {
                 let (left, right) = disk.split_at_mut(file_start);
-                (&mut left[start..(start + length)]).swap_with_slice(&mut right[..length]);
+                left[start..(start + length)].swap_with_slice(&mut right[..length]);
 
                 if !free_blocks.remove(&(start, end)) {
                     panic!("we found free blocks that didn't exist!?");
