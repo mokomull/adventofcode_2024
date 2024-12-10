@@ -5,8 +5,7 @@ use petgraph::{
     algo::{all_simple_paths, dijkstra},
     visit::{
         Data, GraphBase, GraphProp, IntoEdgeReferences, IntoEdges, IntoNeighbors,
-        IntoNeighborsDirected, IntoNodeIdentifiers, NodeCompactIndexable, NodeCount, NodeIndexable,
-        Visitable,
+        IntoNeighborsDirected, NodeCount, Visitable,
     },
     Directed,
     Direction::{self, Incoming, Outgoing},
@@ -111,36 +110,11 @@ impl Visitable for Solution {
     }
 }
 
-impl<'a> IntoNodeIdentifiers for &'a Solution {
-    type NodeIdentifiers = Box<dyn Iterator<Item = (usize, usize)> + 'a>;
-
-    fn node_identifiers(self) -> Self::NodeIdentifiers {
-        Box::new((0..self.map.len()).flat_map(|i| (0..self.map[i].len()).map(move |j| (i, j))))
-    }
-}
-
 impl NodeCount for Solution {
     fn node_count(&self) -> usize {
         self.map.len() * self.map[0].len()
     }
 }
-
-impl NodeIndexable for Solution {
-    fn node_bound(&self) -> usize {
-        self.node_count()
-    }
-
-    fn to_index(&self, (i, j): Self::NodeId) -> usize {
-        i * self.map[0].len() + j
-    }
-
-    #[doc = r" Convert `i` to a node index. `i` must be a valid value in the graph."]
-    fn from_index(&self, x: usize) -> Self::NodeId {
-        (x / self.map[0].len(), x % self.map[0].len())
-    }
-}
-
-impl NodeCompactIndexable for Solution {}
 
 impl<'a> IntoEdgeReferences for &'a Solution {
     type EdgeRef = ((usize, usize), (usize, usize), &'static ());
@@ -149,7 +123,8 @@ impl<'a> IntoEdgeReferences for &'a Solution {
 
     fn edge_references(self) -> Self::EdgeReferences {
         Box::new(
-            self.node_identifiers()
+            (0..self.map.len())
+                .flat_map(|i| (0..self.map[0].len()).map(move |j| (i, j)))
                 .flat_map(|(i, j)| self.edges((i, j))),
         )
     }
