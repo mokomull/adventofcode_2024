@@ -8,7 +8,7 @@ static INPUT: &str = include_str!("input.txt");
 fn day_10() {
     let solution = Solution::new(INPUT);
     assert_eq!(593, solution.part1().unwrap());
-    assert_eq!(0, solution.part2().unwrap());
+    assert_eq!(1192, solution.part2().unwrap());
 }
 
 #[test]
@@ -35,4 +35,5 @@ fn larger_example() {
 10456732",
     );
     assert_eq!(36, solution.part1().unwrap());
+    assert_eq!(81, solution.part2().unwrap());
 }

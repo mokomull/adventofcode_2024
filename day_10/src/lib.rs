@@ -2,12 +2,13 @@
 mod test;
 
 use petgraph::{
-    algo::floyd_warshall,
+    algo::{all_simple_paths, floyd_warshall},
     visit::{
-        Data, GraphBase, GraphProp, IntoEdgeReferences, IntoNodeIdentifiers, NodeCompactIndexable,
-        NodeCount, NodeIndexable,
+        Data, GraphBase, GraphProp, IntoEdgeReferences, IntoNeighbors, IntoNeighborsDirected,
+        IntoNodeIdentifiers, NodeCompactIndexable, NodeCount, NodeIndexable,
     },
     Directed,
+    Direction::{self, Incoming, Outgoing},
 };
 use prelude::*;
 
@@ -61,7 +62,27 @@ impl Day for Solution {
     }
 
     fn part2(&self) -> anyhow::Result<u64> {
-        todo!()
+        let mut possible_trailheads = Vec::new();
+        let mut peaks = Vec::new();
+
+        for (i, row) in self.map.iter().enumerate() {
+            for (j, &height) in row.iter().enumerate() {
+                if height == 0 {
+                    possible_trailheads.push((i, j));
+                }
+                if height == 9 {
+                    peaks.push((i, j));
+                }
+            }
+        }
+
+        Ok(possible_trailheads
+            .into_iter()
+            .cartesian_product(&peaks)
+            .map(|(trailhead, peak)| {
+                all_simple_paths::<Vec<_>, _>(&self, trailhead, *peak, 0, None).count() as u64
+            })
+            .sum())
     }
 }
 
@@ -116,23 +137,45 @@ impl<'a> IntoEdgeReferences for &'a Solution {
     type EdgeReferences = Box<dyn Iterator<Item = Self::EdgeRef> + 'a>;
 
     fn edge_references(self) -> Self::EdgeReferences {
-        Box::new(self.node_identifiers().flat_map(|(i, j)| {
-            let mut edges = vec![];
-            let one_step_up = self.map[i][j] + 1;
-            if i > 0 && self.map[i - 1][j] == one_step_up {
-                edges.push(((i, j), (i - 1, j), &()));
-            }
-            if j > 0 && self.map[i][j - 1] == one_step_up {
-                edges.push(((i, j), (i, j - 1), &()));
-            }
-            if i < self.map.len() - 1 && self.map[i + 1][j] == one_step_up {
-                edges.push(((i, j), (i + 1, j), &()));
-            }
-            if j < self.map[i].len() - 1 && self.map[i][j + 1] == one_step_up {
-                edges.push(((i, j), (i, j + 1), &()));
-            }
+        Box::new(
+            self.node_identifiers()
+                .flat_map(|(i, j)| self.neighbors((i, j)).map(move |next| ((i, j), next, &()))),
+        )
+    }
+}
 
-            edges.into_iter()
-        }))
+impl<'a> IntoNeighbors for &'a Solution {
+    type Neighbors = std::vec::IntoIter<Self::NodeId>;
+
+    fn neighbors(self, n: Self::NodeId) -> Self::Neighbors {
+        self.neighbors_directed(n, Outgoing)
+    }
+}
+
+impl<'a> IntoNeighborsDirected for &'a Solution {
+    type NeighborsDirected = std::vec::IntoIter<Self::NodeId>;
+
+    fn neighbors_directed(self, (i, j): Self::NodeId, d: Direction) -> Self::NeighborsDirected {
+        let target = match (self.map[i][j], d) {
+            (0, Incoming) | (9, Outgoing) => return Vec::new().into_iter(),
+            (_, Incoming) => self.map[i][j] - 1,
+            (_, Outgoing) => self.map[i][j] + 1,
+        };
+
+        let mut neighbors = Vec::new();
+        if i > 0 && self.map[i - 1][j] == target {
+            neighbors.push((i - 1, j));
+        }
+        if j > 0 && self.map[i][j - 1] == target {
+            neighbors.push((i, j - 1));
+        }
+        if i < self.map.len() - 1 && self.map[i + 1][j] == target {
+            neighbors.push((i + 1, j));
+        }
+        if j < self.map[i].len() - 1 && self.map[i][j + 1] == target {
+            neighbors.push((i, j + 1));
+        }
+
+        neighbors.into_iter()
     }
 }
