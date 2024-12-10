@@ -42,13 +42,24 @@ impl Day for Solution {
             }
         }
 
+        possible_trailheads.sort_unstable();
+
         Ok(possible_trailheads
             .into_iter()
             .map(|trailhead| {
-                peaks
+                let count = peaks
                     .iter()
-                    .filter(|&&peak| all_pairs.contains_key(&(trailhead, peak)))
-                    .count()
+                    .filter(|&&peak| {
+                        if let Some(distance) = all_pairs.get(&(trailhead, peak)) {
+                            eprintln!("{:?} to {:?} is {}", trailhead, peak, distance);
+                            true
+                        } else {
+                            false
+                        }
+                    } )
+                    .count();
+                eprintln!("peak at {:?} has score {}", trailhead, count);
+                count
             })
             .sum::<usize>() as u64)
     }
