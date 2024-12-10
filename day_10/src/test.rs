@@ -35,4 +35,5 @@ fn larger_example() {
 10456732",
     );
     assert_eq!(36, solution.part1().unwrap());
+    assert_eq!(81, solution.part2().unwrap());
 }
