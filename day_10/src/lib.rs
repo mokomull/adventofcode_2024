@@ -26,7 +26,7 @@ impl Day for Solution {
 
     fn part1(&self) -> anyhow::Result<u64> {
         let all_pairs =
-            floyd_warshall(&self, |_| 1).expect("no negative weights in the first place");
+            floyd_warshall(&self, |_| 1_u32).expect("no negative weights in the first place");
 
         let mut possible_trailheads = Vec::new();
         let mut peaks = Vec::new();
@@ -49,14 +49,10 @@ impl Day for Solution {
             .map(|trailhead| {
                 let count = peaks
                     .iter()
-                    .filter(|&&peak| {
-                        if let Some(distance) = all_pairs.get(&(trailhead, peak)) {
-                            eprintln!("{:?} to {:?} is {}", trailhead, peak, distance);
-                            true
-                        } else {
-                            false
-                        }
-                    } )
+                    .filter(|&&peak| match all_pairs.get(&(trailhead, peak)) {
+                        None | Some(&u32::MAX) => false,
+                        _ => true,
+                    })
                     .count();
                 eprintln!("peak at {:?} has score {}", trailhead, count);
                 count
