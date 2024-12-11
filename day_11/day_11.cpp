@@ -57,7 +57,15 @@ int main()
         stones.push_back(i);
     }
 
-    for (int i = 0; i < 25; ++i) {
+    for (int i = 0; i < 25; ++i)
+    {
+        blink(stones);
+    }
+
+    std::cout << stones.size() << std::endl;
+
+    for (int i = 0; i < 50; ++i)
+    {
         blink(stones);
     }
 
