@@ -12,7 +12,7 @@ struct Solution {
 
 impl Day for Solution {
     fn new(input: &str) -> Self {
-        let mut bytes = input.bytes();
+        let mut bytes = input.trim().bytes();
         let mut disk = Vec::new();
 
         let mut file_id = 0;
