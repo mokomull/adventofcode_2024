@@ -66,5 +66,5 @@ fn count_stones(remaining_count: u8, stone: u64, memo: &mut HashMap<(u8, u64), u
 
     let res = count_stones(remaining_count - 1, stone * 2024, memo);
     memo.insert((remaining_count, stone), res);
-    return res;
+    res
 }
