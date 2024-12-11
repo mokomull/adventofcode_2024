@@ -26,7 +26,11 @@ impl Day for Solution {
     }
 
     fn part2(&self) -> anyhow::Result<u64> {
-        todo!()
+        Ok(self
+            .stones
+            .iter()
+            .map(|&s| count_stones(75, s) as u64)
+            .sum())
     }
 }
 
