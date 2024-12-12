@@ -34,25 +34,33 @@ impl Day for Solution {
 
                 let (i, j) = this;
                 if i > 0 && self.map[i - 1][j] == self.map[i][j] {
-                    to_visit_this.insert((i - 1, j));
+                    if to_visit.contains(&(i - 1, j)) {
+                        to_visit_this.insert((i - 1, j));
+                    }
                 } else {
                     perimeter += 1;
                 }
 
                 if j > 0 && self.map[i][j - 1] == self.map[i][j] {
-                    to_visit_this.insert((i, j - 1));
+                    if to_visit.contains(&(i, j - 1)) {
+                        to_visit_this.insert((i, j - 1));
+                    }
                 } else {
                     perimeter += 1;
                 }
 
                 if i < self.map.len() - 1 && self.map[i + 1][j] == self.map[i][j] {
-                    to_visit_this.insert((i + 1, j));
+                    if to_visit.contains(&(i + 1, j)) {
+                        to_visit_this.insert((i + 1, j));
+                    }
                 } else {
                     perimeter += 1;
                 }
 
-                if j < self.map[i].len() && self.map[i][j + 1] == self.map[i][j] {
-                    to_visit_this.insert((i, j + 1));
+                if j < self.map[i].len() - 1 && self.map[i][j + 1] == self.map[i][j] {
+                    if to_visit.contains(&(i, j + 1)) {
+                        to_visit_this.insert((i, j + 1));
+                    }
                 } else {
                     perimeter += 1;
                 }
