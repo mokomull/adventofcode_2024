@@ -23,3 +23,14 @@ OOOOO
     );
     assert_eq!(772, solution.part1().unwrap());
 }
+
+#[test]
+fn small_example() {
+    let solution = Solution::new(
+        "AAAA
+BBCD
+BBCC
+EEEC",
+    );
+    assert_eq!(80, solution.part2().unwrap());
+}
