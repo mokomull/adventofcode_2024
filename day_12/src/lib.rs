@@ -155,33 +155,33 @@ impl Day for Solution {
                     // Remove all the other things in perimeter that are on the same "side" as this
                     // one.
                     Left | Right => {
-                        let mut i = i - 1;
-                        while perimeter.contains(&(i, j, s)) {
-                            eprintln!("ignoring {:?}", (i,j,s));
-                            perimeter.remove(&(i, j, s));
-                            i -= 1;
+                        let mut up_i = i - 1;
+                        while perimeter.contains(&(up_i, j, s)) {
+                            eprintln!("ignoring {:?}", (up_i, j, s));
+                            perimeter.remove(&(up_i, j, s));
+                            up_i -= 1;
                         }
-                        
-                        let mut i = i + 1;
-                        while perimeter.contains(&(i, j, s)) {
-                            eprintln!("ignoring {:?}", (i,j,s));
-                            perimeter.remove(&(i, j, s));
-                            i += 1;
+
+                        let mut down_i = i + 1;
+                        while perimeter.contains(&(down_i, j, s)) {
+                            eprintln!("ignoring {:?}", (down_i, j, s));
+                            perimeter.remove(&(down_i, j, s));
+                            down_i += 1;
                         }
                     }
                     Top | Bottom => {
-                        let mut j = j - 1;
-                        while perimeter.contains(&(i, j, s)) {
-                            eprintln!("ignoring {:?}", (i,j,s));
-                            perimeter.remove(&(i, j, s));
-                            j -= 1;
+                        let mut left_j = j - 1;
+                        while perimeter.contains(&(i, left_j, s)) {
+                            eprintln!("ignoring {:?}", (i, left_j, s));
+                            perimeter.remove(&(i, left_j, s));
+                            left_j -= 1;
                         }
-                        
-                        let mut j = j + 1;
-                        while perimeter.contains(&(i, j, s)) {
-                            eprintln!("ignoring {:?}", (i,j,s));
-                            perimeter.remove(&(i, j, s));
-                            j += 1;
+
+                        let mut right_j = j + 1;
+                        while perimeter.contains(&(i, right_j, s)) {
+                            eprintln!("ignoring {:?}", (i, right_j, s));
+                            perimeter.remove(&(i, right_j, s));
+                            right_j += 1;
                         }
                     }
                 }
