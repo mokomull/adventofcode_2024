@@ -10,3 +10,16 @@ fn day_12() {
     assert_eq!(0, solution.part1().unwrap());
     assert_eq!(0, solution.part2().unwrap());
 }
+
+#[test]
+fn example() {
+    let solution = Solution::new(
+        "OOOOO
+OXOXO
+OOOOO
+OXOXO
+OOOOO
+",
+    );
+    assert_eq!(772, solution.part1().unwrap());
+}
