@@ -70,7 +70,7 @@ impl Day for Solution {
             }
 
             eprintln!("area {}, perimiter {}", area, perimeter);
-            total += area + perimeter;
+            total += area * perimeter;
         }
 
         Ok(total)
