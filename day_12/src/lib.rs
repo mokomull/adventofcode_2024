@@ -84,7 +84,7 @@ impl Day for Solution {
         let mut total = 0;
 
         while !to_visit.is_empty() {
-            #[derive(PartialEq, Eq, Hash, Clone, Copy)]
+            #[derive(PartialEq, Eq, Hash, Clone, Copy, Debug)]
             enum Side {
                 Top,
                 Left,
@@ -140,11 +140,14 @@ impl Day for Solution {
                 }
             }
 
+            dbg!(&perimeter);
+
             let mut sides = 0;
 
             while !perimeter.is_empty() {
                 let side = perimeter.iter().cloned().next().unwrap();
                 perimeter.remove(&(side));
+                eprintln!("counting {:?}", side);
                 sides += 1;
 
                 let (i, j, s) = side;
@@ -154,12 +157,14 @@ impl Day for Solution {
                     Left | Right => {
                         let mut i = i - 1;
                         while perimeter.contains(&(i, j, s)) {
+                            eprintln!("ignoring {:?}", (i,j,s));
                             perimeter.remove(&(i, j, s));
                             i -= 1;
                         }
-
+                        
                         let mut i = i + 1;
                         while perimeter.contains(&(i, j, s)) {
+                            eprintln!("ignoring {:?}", (i,j,s));
                             perimeter.remove(&(i, j, s));
                             i += 1;
                         }
@@ -167,12 +172,14 @@ impl Day for Solution {
                     Top | Bottom => {
                         let mut j = j - 1;
                         while perimeter.contains(&(i, j, s)) {
+                            eprintln!("ignoring {:?}", (i,j,s));
                             perimeter.remove(&(i, j, s));
                             j -= 1;
                         }
-
+                        
                         let mut j = j + 1;
                         while perimeter.contains(&(i, j, s)) {
+                            eprintln!("ignoring {:?}", (i,j,s));
                             perimeter.remove(&(i, j, s));
                             j += 1;
                         }
@@ -180,6 +187,7 @@ impl Day for Solution {
                 }
             }
 
+            eprintln!("area {}, sides {}", area, sides);
             total += area * sides;
         }
 
