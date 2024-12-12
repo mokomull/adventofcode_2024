@@ -24,7 +24,10 @@ impl Day for Solution {
         while !to_visit.is_empty() {
             let mut perimeter = 0;
             let mut area = 0;
-            let mut to_visit_this = HashSet::from([to_visit.iter().cloned().next().unwrap()]);
+            let start = to_visit.iter().cloned().next().unwrap();
+            let mut to_visit_this = HashSet::from([start]);
+
+            eprintln!("visiting region {}", self.map[start.0][start.1] as char);
 
             while !to_visit_this.is_empty() {
                 let this = to_visit_this.iter().cloned().next().unwrap();
@@ -66,6 +69,7 @@ impl Day for Solution {
                 }
             }
 
+            eprintln!("area {}, perimiter {}", area, perimeter);
             total += area + perimeter;
         }
 
