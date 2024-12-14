@@ -9,10 +9,13 @@ fn main() {
     let mut solution = Solution::new(INPUT);
     for i in 1.. {
         solution.step();
-        println!("after {i} steps:");
-        solution.render();
 
-        let mut junk = String::new();
-        stdin().read_line(&mut junk).unwrap();
+        if solution.is_maybe_christmas_tree() {
+            println!("after {i} steps:");
+            solution.render();
+
+            let mut junk = String::new();
+            stdin().read_line(&mut junk).unwrap();
+        }
     }
 }

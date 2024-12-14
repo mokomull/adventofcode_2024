@@ -99,13 +99,16 @@ impl Solution {
         }
     }
 
-    pub fn render(&self) {
-        let mut map = [[false; 101]; 103];
+    fn to_bits(&self) -> [[bool; 101]; 103] {
+        let mut map: [[bool; 101]; 103] = [[false; 101]; 103];
         for robot in &self.robots {
             map[robot.position.1 as usize][robot.position.0 as usize] = true;
         }
+        map
+    }
 
-        for line in map {
+    pub fn render(&self) {
+        for line in self.to_bits() {
             for c in line {
                 if c {
                     print!("X");
@@ -115,5 +118,19 @@ impl Solution {
             }
             println!();
         }
+    }
+
+    /// Assume that in this "picture of a Christmas tree", the top left 20x20 pixels will be blank
+    pub fn is_maybe_christmas_tree(&self) -> bool {
+        let bits = self.to_bits();
+        for row in 0..20 {
+            for col in 0..20 {
+                if bits[row][col] {
+                    return false;
+                }
+            }
+        }
+
+        true
     }
 }
