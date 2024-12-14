@@ -4,9 +4,10 @@ use rational::extras::gcd;
 #[cfg(test)]
 mod test;
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 struct Pair(i64, i64);
 
+#[derive(Clone)]
 struct Machine {
     button_a: Pair,
     button_b: Pair,
@@ -130,7 +131,18 @@ impl Day for Solution {
     }
 
     fn part2(&self) -> anyhow::Result<u64> {
-        todo!()
+        Ok(self
+            .machines
+            .iter()
+            .filter_map(|m| {
+                let new_machine = Machine {
+                    prize: Pair(10000000000000 + m.prize.0, 10000000000000 + m.prize.1),
+                    ..m.clone()
+                };
+                new_machine.solve()
+            })
+            .map(|Pair(a, b)| 3 * a + b)
+            .sum::<i64>() as u64)
     }
 }
 
