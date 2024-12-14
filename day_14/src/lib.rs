@@ -134,17 +134,8 @@ impl Solution {
         }
     }
 
-    /// Assume that in this "picture of a Christmas tree", the top left 20x20 pixels will be blank
+    /// Anything could be a Christmas tree, we only have 10,000 images to look through...
     pub fn is_maybe_christmas_tree(&self) -> bool {
-        let bits = self.to_bits();
-        for row in 0..20 {
-            for col in 0..20 {
-                if bits[row][col] {
-                    return false;
-                }
-            }
-        }
-
         true
     }
 }
