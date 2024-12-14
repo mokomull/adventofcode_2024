@@ -140,6 +140,7 @@ name = "day_13"
 version = "0.1.0"
 dependencies = [
  "prelude 0.1.0",
+ "rational",
 ]
 
 [[package]]
