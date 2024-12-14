@@ -33,7 +33,45 @@ impl Day for Solution {
     }
 
     fn part1(&self) -> anyhow::Result<u64> {
-        todo!()
+        let mut ending = Vec::new();
+        for robot in &self.robots {
+            ending.push((
+                robot.position.0 + 100 * robot.velocity.0,
+                robot.position.1 + 100 * robot.velocity.1,
+            ));
+        }
+
+        for position in &mut ending {
+            position.0 %= 101;
+            if position.0 < 0 {
+                position.0 += 101;
+            }
+
+            position.1 %= 103;
+            if position.1 < 0 {
+                position.1 += 103;
+            }
+        }
+
+        let mut quadrants = [0; 4];
+        for (x, y) in ending {
+            let left = (0..50).contains(&x);
+            let right = (51..101).contains(&x);
+            let top = (0..51).contains(&y);
+            let bottom = (52..103).contains(&y);
+
+            if left && top {
+                quadrants[0] += 1;
+            } else if left && bottom {
+                quadrants[1] += 1;
+            } else if right && top {
+                quadrants[2] += 1;
+            } else if right && bottom {
+                quadrants[3] += 1;
+            }
+        }
+
+        Ok(quadrants.into_iter().product::<i64>() as u64)
     }
 
     fn part2(&self) -> anyhow::Result<u64> {
