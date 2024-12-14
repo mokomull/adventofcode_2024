@@ -4,7 +4,7 @@ use prelude::*;
 mod test;
 
 struct Robot {
-    position: (i64, i64),
+    pub position: (i64, i64),
     velocity: (i64, i64),
 }
 
@@ -76,5 +76,44 @@ impl Day for Solution {
 
     fn part2(&self) -> anyhow::Result<u64> {
         todo!()
+    }
+}
+
+impl Solution {
+    pub fn step(&mut self) {
+        for robot in &mut self.robots {
+            robot.position = (
+                robot.position.0 + 100 * robot.velocity.0,
+                robot.position.1 + 100 * robot.velocity.1,
+            );
+
+            robot.position.0 %= 101;
+            if robot.position.0 < 0 {
+                robot.position.0 += 101;
+            }
+
+            robot.position.1 %= 103;
+            if robot.position.1 < 0 {
+                robot.position.1 += 103;
+            }
+        }
+    }
+
+    pub fn render(&self) {
+        let mut map = [[false; 101]; 103];
+        for robot in &self.robots {
+            map[robot.position.1 as usize][robot.position.0 as usize] = true;
+        }
+
+        for line in map {
+            for c in line {
+                if c {
+                    print!("X");
+                } else {
+                    print!(" ");
+                }
+            }
+            println!();
+        }
     }
 }
