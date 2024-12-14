@@ -3,11 +3,13 @@ use prelude::*;
 #[cfg(test)]
 mod test;
 
+#[derive(Clone)]
 struct Robot {
     pub position: (i64, i64),
     velocity: (i64, i64),
 }
 
+#[derive(Clone)]
 pub struct Solution {
     robots: Vec<Robot>,
 }
@@ -75,7 +77,19 @@ impl Day for Solution {
     }
 
     fn part2(&self) -> anyhow::Result<u64> {
-        todo!()
+        // Maybe "fewest number of seconds that must elapse" is looking for the cycle length...
+        let mut dummy = self.clone();
+        let mut seen = HashMap::new();
+
+        for i in 0.. {
+            if let Some(last) = seen.insert(dummy.to_bits(), i) {
+                return Ok(i - last);
+            }
+
+            dummy.step();
+        }
+
+        anyhow::bail!("No cycle was ever found.");
     }
 }
 
