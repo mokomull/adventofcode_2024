@@ -134,8 +134,10 @@ impl Solution {
         }
     }
 
-    /// Anything could be a Christmas tree, we only have 10,000 images to look through...
+    /// Assumes a picture of a Christmas tree would have ten pixels in a horizontal line...
     pub fn is_maybe_christmas_tree(&self) -> bool {
-        true
+        self.to_bits()
+            .into_iter()
+            .any(|line| line.windows(10).any(|window| window.iter().all(|b| *b)))
     }
 }
