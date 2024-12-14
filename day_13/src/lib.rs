@@ -125,7 +125,7 @@ impl Day for Solution {
             .machines
             .iter()
             .filter_map(Machine::solve)
-            .map(|Pair(a, b)| a + b)
+            .map(|Pair(a, b)| 3 * a + b)
             .sum::<i64>() as u64)
     }
 
