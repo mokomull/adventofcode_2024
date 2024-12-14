@@ -11,6 +11,12 @@ struct Machine {
     prize: Pair,
 }
 
+impl Machine {
+    fn solve(&self) -> Option<Pair> {
+        todo!("matrix math, probably")
+    }
+}
+
 pub struct Solution {
     machines: Vec<Machine>,
 }
@@ -42,7 +48,12 @@ impl Day for Solution {
     }
 
     fn part1(&self) -> anyhow::Result<u64> {
-        todo!()
+        Ok(self
+            .machines
+            .iter()
+            .filter_map(Machine::solve)
+            .map(|Pair(a, b)| a + b)
+            .sum::<i64>() as u64)
     }
 
     fn part2(&self) -> anyhow::Result<u64> {
