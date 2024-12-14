@@ -77,19 +77,16 @@ impl Day for Solution {
     }
 
     fn part2(&self) -> anyhow::Result<u64> {
-        // Maybe "fewest number of seconds that must elapse" is looking for the cycle length...
         let mut dummy = self.clone();
-        let mut seen = HashMap::new();
 
         for i in 0.. {
-            if let Some(last) = seen.insert(dummy.to_bits(), i) {
-                return Ok(i - last);
+            if dummy.is_maybe_christmas_tree() {
+                return Ok(i);
             }
-
             dummy.step();
         }
 
-        anyhow::bail!("No cycle was ever found.");
+        anyhow::bail!("No tree was ever found.");
     }
 }
 
