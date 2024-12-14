@@ -71,7 +71,7 @@ fn integer_rref(mut matrix: Matrix) -> Option<Matrix> {
     // use the second row to back-substitude in the first row
     let y_factor = matrix[0][1];
     for col in 0..3 {
-        matrix[0][col] = matrix[0][col] - matrix[1][col] * y_factor;
+        matrix[0][col] -= matrix[1][col] * y_factor;
     }
     assert_eq!(0, matrix[0][1]);
 
