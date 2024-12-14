@@ -83,8 +83,8 @@ impl Solution {
     pub fn step(&mut self) {
         for robot in &mut self.robots {
             robot.position = (
-                robot.position.0 + 100 * robot.velocity.0,
-                robot.position.1 + 100 * robot.velocity.1,
+                robot.position.0 + robot.velocity.0,
+                robot.position.1 + robot.velocity.1,
             );
 
             robot.position.0 %= 101;
