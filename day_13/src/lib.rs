@@ -4,6 +4,7 @@ use rational::extras::gcd;
 #[cfg(test)]
 mod test;
 
+#[derive(Debug, PartialEq)]
 struct Pair(i64, i64);
 
 struct Machine {
@@ -41,7 +42,7 @@ fn integer_rref(mut matrix: Matrix) -> Option<Matrix> {
     assert_eq!(0, matrix[1][0]);
 
     // if this also eliminated the second column, then we're either over- or under-constrained
-    if matrix[1][1]== 0 {
+    if matrix[1][1] == 0 {
         // just return None in both cases -- we don't actually care if it's unwinnable or if all
         // integers are solutions, because we'd still end up spending (0, 0) tokens.
         return None;
