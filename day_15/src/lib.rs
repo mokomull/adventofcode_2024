@@ -1,3 +1,5 @@
+use core::str;
+
 use prelude::*;
 
 #[cfg(test)]
@@ -86,6 +88,9 @@ impl Day for Solution {
             })
             .collect();
 
+        eprintln!("Initial state:");
+        render(&map);
+
         let mut robot = self
             .map
             .iter()
@@ -103,6 +108,9 @@ impl Day for Solution {
                 x => panic!("unexpected direction {:?}", x),
             };
             robot = wide_push(f, &mut map, robot);
+
+            eprintln!("Move {}", m as char);
+            render(&map);
         }
 
         Ok(map
@@ -207,4 +215,11 @@ where
     map[robot.0][robot.1] = b'.';
 
     step(robot)
+}
+
+fn render(map: &[Vec<u8>]) {
+    for line in map {
+        eprintln!("{}", str::from_utf8(line).unwrap());
+    }
+    eprintln!();
 }

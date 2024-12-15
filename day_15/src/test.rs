@@ -9,8 +9,10 @@ fn day_15() {
     assert_eq!(0, solution.part2().unwrap());
 }
 
-#[test] fn example() {
-    let solution = Solution::new("#######
+#[test]
+fn example() {
+    let solution = Solution::new(
+        "#######
 #...#.#
 #.....#
 #..OO@#
@@ -18,6 +20,7 @@ fn day_15() {
 #.....#
 #######
 
-<vv<<^^<<^^");
+<vv<<^^<<^^",
+    );
     assert_eq!(9021, solution.part2().unwrap());
 }
