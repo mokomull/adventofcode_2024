@@ -89,9 +89,6 @@ impl Day for Solution {
             })
             .collect();
 
-        eprintln!("Initial state:");
-        render(&map);
-
         let mut robot = map
             .iter()
             .enumerate()
@@ -108,9 +105,6 @@ impl Day for Solution {
                 x => panic!("unexpected direction {:?}", x),
             };
             robot = wide_push(f, &mut map, robot);
-
-            eprintln!("Move {}", m as char);
-            render(&map);
         }
 
         Ok(map
@@ -187,13 +181,13 @@ where
         match map[i][j] {
             b'[' => {
                 // still a stone so keep looking
-                to_visit.push_back(dbg!((i, j)));
-                to_visit.push_back(dbg!((i, j + 1)));
+                to_visit.push_back((i, j));
+                to_visit.push_back((i, j + 1));
             }
             b']' => {
                 // other side of a stone
-                to_visit.push_back(dbg!((i, j)));
-                to_visit.push_back(dbg!((i, j - 1)));
+                to_visit.push_back((i, j));
+                to_visit.push_back((i, j - 1));
             }
             b'#' => {
                 // a wall, so we can't move anything
@@ -206,20 +200,12 @@ where
         }
     }
 
-    dbg!(&visited);
-
     // everything that is in `visited` is a stone or the robot, and should be moved.  Do this in the
     // reverse-order in which we discovered things so that we can always replace the "from" with a
     // '.', which will get overwritten if something else gets pushed into this square
     let old_map = map.clone();
     for (i, j) in visit_order.into_iter().rev() {
         let (new_i, new_j) = step((i, j));
-        eprintln!(
-            "Moving {} from {:?} to {:?}",
-            old_map[i][j] as char,
-            (i, j),
-            (new_i, new_j)
-        );
         map[new_i][new_j] = old_map[i][j];
         map[i][j] = b'.';
     }
@@ -227,11 +213,4 @@ where
     map[robot.0][robot.1] = b'.';
 
     step(robot)
-}
-
-fn render(map: &[Vec<u8>]) {
-    for line in map {
-        eprintln!("{}", str::from_utf8(line).unwrap());
-    }
-    eprintln!();
 }
