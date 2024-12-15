@@ -91,8 +91,7 @@ impl Day for Solution {
         eprintln!("Initial state:");
         render(&map);
 
-        let mut robot = self
-            .map
+        let mut robot = map
             .iter()
             .enumerate()
             .filter_map(|(i, line)| line.iter().position(|&c| c == b'@').map(|j| (i, j)))
@@ -204,6 +203,8 @@ where
             }
         }
     }
+
+    dbg!(&visited);
 
     // everything that is in `visited` is a stone or the robot, and should be moved up
     let old_map = map.clone();
