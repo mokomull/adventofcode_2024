@@ -174,14 +174,11 @@ where
     // everything that is in `visited` is a stone or the robot, and should be moved.  Do this in the
     // reverse-order in which we discovered things so that we can always replace the "from" with a
     // '.', which will get overwritten if something else gets pushed into this square
-    let old_map = map.clone();
     for (i, j) in visit_order.into_iter().rev() {
         let (new_i, new_j) = step((i, j));
-        map[new_i][new_j] = old_map[i][j];
+        map[new_i][new_j] = map[i][j];
         map[i][j] = b'.';
     }
-    // and we just copied over the robot rather than overwriting it, so clear it out now
-    map[robot.0][robot.1] = b'.';
 
     step(robot)
 }
