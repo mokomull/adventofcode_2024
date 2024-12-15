@@ -22,5 +22,5 @@ fn example() {
 
 <vv<<^^<<^^",
     );
-    assert_eq!(9021, solution.part2().unwrap());
+    assert_eq!(105 + 207 + 306, solution.part2().unwrap());
 }
