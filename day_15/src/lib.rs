@@ -127,6 +127,7 @@ impl Day for Solution {
 }
 
 // Returns the next position of the robot, which might be the same as we started, or it might have moved.
+#[allow(clippy::ptr_arg)]
 fn push<F>(step: F, map: &mut Vec<Vec<u8>>, robot: (usize, usize)) -> (usize, usize)
 where
     F: Fn((usize, usize)) -> (usize, usize),
@@ -137,7 +138,6 @@ where
         match map[i][j] {
             b'O' => {
                 // still a stone so keep looking
-                ()
             }
             b'#' => {
                 // a wall, so we can't move anything
@@ -163,6 +163,7 @@ where
 
 // Returns the next position of the robot.  This is very similar to the above solution, except we
 // keep a list of work to do since one visit can create two squares to look at.
+#[allow(clippy::ptr_arg)]
 fn wide_push<F>(step: F, map: &mut Vec<Vec<u8>>, robot: (usize, usize)) -> (usize, usize)
 where
     F: Fn((usize, usize)) -> (usize, usize),
