@@ -104,7 +104,7 @@ impl Day for Solution {
                 b'v' => |(i, j)| (i + 1, j),
                 x => panic!("unexpected direction {:?}", x),
             };
-            robot = wide_push(f, &mut map, robot);
+            robot = push(f, &mut map, robot);
         }
 
         Ok(map
@@ -132,42 +132,8 @@ fn push<F>(step: F, map: &mut Vec<Vec<u8>>, robot: (usize, usize)) -> (usize, us
 where
     F: Fn((usize, usize)) -> (usize, usize),
 {
-    let (mut i, mut j) = robot;
-    loop {
-        (i, j) = step((i, j));
-        match map[i][j] {
-            b'O' => {
-                // still a stone so keep looking
-            }
-            b'#' => {
-                // a wall, so we can't move anything
-                return robot;
-            }
-            x => {
-                // this must be an empty space
-                assert_eq!(b'.', x);
-                break;
-            }
-        }
-    }
-
-    // stone grew one-step-past-the-last-stone-we-saw
-    map[i][j] = b'O';
-    // and the robot moves one step
-    let (new_robot_i, new_robot_j) = step(robot);
-    map[robot.0][robot.1] = b'.';
-    map[new_robot_i][new_robot_j] = b'@';
-
-    (new_robot_i, new_robot_j)
-}
-
-// Returns the next position of the robot.  This is very similar to the above solution, except we
-// keep a list of work to do since one visit can create two squares to look at.
-#[allow(clippy::ptr_arg)]
-fn wide_push<F>(step: F, map: &mut Vec<Vec<u8>>, robot: (usize, usize)) -> (usize, usize)
-where
-    F: Fn((usize, usize)) -> (usize, usize),
-{
+    // Keep a list of the work to be done -- for part 2, one side of a stone can spawn two work
+    // items.  It's expected that for part 1 this is purely linear.
     let mut to_visit: VecDeque<(usize, usize)> = VecDeque::new();
     let mut visited: HashSet<(usize, usize)> = HashSet::new();
     let mut visit_order: Vec<(usize, usize)> = Vec::new();
@@ -180,13 +146,17 @@ where
 
         let (i, j) = step((i, j));
         match map[i][j] {
+            b'O' => {
+                // one single stone from part 1 so keep looking
+                to_visit.push_back((i, j));
+            }
             b'[' => {
-                // still a stone so keep looking
+                // half of a stone from part 2 so keep looking
                 to_visit.push_back((i, j));
                 to_visit.push_back((i, j + 1));
             }
             b']' => {
-                // other side of a stone
+                // other side of a part 2 stone
                 to_visit.push_back((i, j));
                 to_visit.push_back((i, j - 1));
             }
