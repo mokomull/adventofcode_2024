@@ -184,13 +184,13 @@ where
         match map[i][j] {
             b'[' => {
                 // still a stone so keep looking
-                to_visit.push((i, j));
-                to_visit.push((i, j + 1));
+                to_visit.push(dbg!((i, j)));
+                to_visit.push(dbg!((i, j + 1)));
             }
             b']' => {
                 // other side of a stone
-                to_visit.push((i, j));
-                to_visit.push((i, j - 1));
+                to_visit.push(dbg!((i, j)));
+                to_visit.push(dbg!((i, j - 1)));
             }
             b'#' => {
                 // a wall, so we can't move anything
@@ -199,7 +199,6 @@ where
             x => {
                 // this must be an empty space
                 assert_eq!(b'.', x);
-                break;
             }
         }
     }
@@ -210,6 +209,12 @@ where
     let old_map = map.clone();
     for (i, j) in visited {
         let (new_i, new_j) = step((i, j));
+        eprintln!(
+            "Moving {} from {:?} to {:?}",
+            old_map[i][j] as char,
+            (i, j),
+            (new_i, new_j)
+        );
         map[new_i][new_j] = old_map[i][j];
     }
     // and we just copied over the robot rather than overwriting it, so clear it out now
