@@ -1,4 +1,5 @@
 use core::str;
+use std::collections::VecDeque;
 
 use prelude::*;
 
@@ -172,25 +173,27 @@ fn wide_push<F>(step: F, map: &mut Vec<Vec<u8>>, robot: (usize, usize)) -> (usiz
 where
     F: Fn((usize, usize)) -> (usize, usize),
 {
-    let mut to_visit: Vec<(usize, usize)> = Vec::new();
+    let mut to_visit: VecDeque<(usize, usize)> = VecDeque::new();
     let mut visited: HashSet<(usize, usize)> = HashSet::new();
-    to_visit.push(robot);
-    while let Some((i, j)) = to_visit.pop() {
+    let mut visit_order: Vec<(usize, usize)> = Vec::new();
+    to_visit.push_back(robot);
+    while let Some((i, j)) = to_visit.pop_front() {
         if !visited.insert((i, j)) {
             continue;
         }
+        visit_order.push((i, j));
 
         let (i, j) = step((i, j));
         match map[i][j] {
             b'[' => {
                 // still a stone so keep looking
-                to_visit.push(dbg!((i, j)));
-                to_visit.push(dbg!((i, j + 1)));
+                to_visit.push_back(dbg!((i, j)));
+                to_visit.push_back(dbg!((i, j + 1)));
             }
             b']' => {
                 // other side of a stone
-                to_visit.push(dbg!((i, j)));
-                to_visit.push(dbg!((i, j - 1)));
+                to_visit.push_back(dbg!((i, j)));
+                to_visit.push_back(dbg!((i, j - 1)));
             }
             b'#' => {
                 // a wall, so we can't move anything
@@ -205,9 +208,11 @@ where
 
     dbg!(&visited);
 
-    // everything that is in `visited` is a stone or the robot, and should be moved up
+    // everything that is in `visited` is a stone or the robot, and should be moved.  Do this in the
+    // reverse-order in which we discovered things so that we can always replace the "from" with a
+    // '.', which will get overwritten if something else gets pushed into this square
     let old_map = map.clone();
-    for (i, j) in visited {
+    for (i, j) in visit_order.into_iter().rev() {
         let (new_i, new_j) = step((i, j));
         eprintln!(
             "Moving {} from {:?} to {:?}",
@@ -216,6 +221,7 @@ where
             (new_i, new_j)
         );
         map[new_i][new_j] = old_map[i][j];
+        map[i][j] = b'.';
     }
     // and we just copied over the robot rather than overwriting it, so clear it out now
     map[robot.0][robot.1] = b'.';
