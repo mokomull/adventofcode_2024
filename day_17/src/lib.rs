@@ -54,7 +54,23 @@ impl Solution {
     }
 
     pub fn part2(&self) -> anyhow::Result<u64> {
-        todo!()
+        for a in 0.. {
+            let mut computer = Computer::from(self);
+            computer.a = a;
+            let mut output = Vec::new();
+
+            while let ControlFlow::Continue(x) = computer.step() {
+                if let Some(x) = x {
+                    output.push(x);
+                }
+            }
+
+            if output == self.program {
+                return Ok(a);
+            }
+        }
+
+        anyhow::bail!("None was ever found.")
     }
 }
 
