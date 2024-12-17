@@ -54,12 +54,17 @@ impl Solution {
     }
 
     pub fn part2(&self) -> anyhow::Result<u64> {
-        for a in 0.. {
+        'next_initial_value: for a in 0.. {
             let mut computer = Computer::from(self);
             computer.a = a;
             let mut output = Vec::new();
 
+            let mut seen = HashSet::new();
             while let ControlFlow::Continue(x) = computer.step() {
+                if !seen.insert((computer.a, computer.b, computer.c, computer.ip)) {
+                    // we've hit an infinite loop.
+                    continue 'next_initial_value;
+                }
                 if let Some(x) = x {
                     output.push(x);
                 }
