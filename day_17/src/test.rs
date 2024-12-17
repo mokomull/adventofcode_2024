@@ -1,6 +1,6 @@
 use crate::*;
 
-static INPUT: &str = "";
+static INPUT: &str = include_str!("input.txt");
 
 #[test]
 fn day_17() {
