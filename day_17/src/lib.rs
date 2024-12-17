@@ -13,8 +13,8 @@ pub struct Solution {
     program: Vec<u64>,
 }
 
-impl Day for Solution {
-    fn new(input: &str) -> Self {
+impl Solution {
+    pub fn new(input: &str) -> Self {
         let mut lines = input.lines();
 
         let register_a = lines.next().unwrap();
@@ -39,11 +39,21 @@ impl Day for Solution {
         Self { a, b, c, program }
     }
 
-    fn part1(&self) -> anyhow::Result<u64> {
-        todo!()
+    pub fn part1(&self) -> anyhow::Result<String> {
+        let mut computer = Computer::from(self);
+
+        let mut output = Vec::new();
+
+        while let ControlFlow::Continue(x) = computer.step() {
+            if let Some(x) = x {
+                output.push(x);
+            }
+        }
+
+        Ok(output.into_iter().join(","))
     }
 
-    fn part2(&self) -> anyhow::Result<u64> {
+    pub fn part2(&self) -> anyhow::Result<u64> {
         todo!()
     }
 }
