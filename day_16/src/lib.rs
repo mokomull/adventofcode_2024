@@ -63,7 +63,73 @@ impl Day for Solution {
     }
 
     fn part2(&self) -> anyhow::Result<u64> {
-        todo!()
+        let mut start = None;
+        let mut end = None;
+
+        for (i, row) in self.map.iter().enumerate() {
+            for (j, c) in row.iter().enumerate() {
+                match c {
+                    b'S' => start = Some((i, j)),
+                    b'E' => end = Some((i, j)),
+                    _ => {}
+                }
+            }
+        }
+
+        let start = start.ok_or_else(|| anyhow!("no start found"))?;
+        let end = end.ok_or_else(|| anyhow!("no end found"))?;
+
+        let mut graph = Graph::from(&self.map);
+        let start = graph.get_or_create_node((start.0, start.1, East));
+
+        let distances = dijkstra(&graph.graph, start, None, |e| -> u64 { *e.weight() });
+
+        let end_nodes = [
+            graph.get_or_create_node((end.0, end.1, East)),
+            graph.get_or_create_node((end.0, end.1, West)),
+            graph.get_or_create_node((end.0, end.1, North)),
+            graph.get_or_create_node((end.0, end.1, South)),
+        ];
+        let target = end_nodes
+            .iter()
+            .flat_map(|n| distances.get(n).cloned())
+            .min()
+            .unwrap();
+
+        // Getting to the start should be zero cost, but double-check that it's actually in our map.
+        assert!(distances.contains_key(&start));
+
+        let mut visited = HashSet::new();
+        for (&node, &distance) in distances.iter() {
+            if distance > target {
+                // we've already blown the budget so stop even thinking about it
+                continue;
+            }
+
+            // if this node is on *a* shortest path, then (shortest path from start to this) +
+            // (shortest path from this to end) must equal our target.
+            let second_halves = dijkstra(&graph.graph, node, None, |e| *e.weight());
+            let second_half = end_nodes
+                .iter()
+                .flat_map(|n| second_halves.get(n).cloned())
+                .min();
+
+            // this node might be part of a wall, in which case there is no path to any end tile.
+            // So we have to make sure `min()` returned Some.
+            if let Some(second_half) = second_half {
+                if distance + second_half == target {
+                    visited.insert(node);
+                }
+            }
+        }
+
+        Ok(graph
+            .node_indexes
+            .into_iter()
+            .filter(|(_name, idx)| visited.contains(idx))
+            .map(|((i, j, _dir), _idx)| (i, j))
+            .collect::<HashSet<_>>()
+            .len() as u64)
     }
 }
 
