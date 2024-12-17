@@ -90,11 +90,11 @@ impl Graph {
                     let no_turn = ret.get_or_create_node((i, j, West));
                     ret.graph.add_edge(no_turn, west, 1);
                     let one_turn_a = ret.get_or_create_node((i, j, North));
-                    ret.graph.add_edge(one_turn_a, west, 1000);
+                    ret.graph.add_edge(one_turn_a, west, 1001);
                     let one_turn_b = ret.get_or_create_node((i, j, South));
-                    ret.graph.add_edge(one_turn_b, west, 1000);
+                    ret.graph.add_edge(one_turn_b, west, 1001);
                     let two_turns = ret.get_or_create_node((i, j, East));
-                    ret.graph.add_edge(two_turns, west, 2000);
+                    ret.graph.add_edge(two_turns, west, 2001);
                 }
 
                 if i > 0 {
@@ -103,11 +103,11 @@ impl Graph {
                     let no_turn = ret.get_or_create_node((i, j, North));
                     ret.graph.add_edge(no_turn, north, 1);
                     let one_turn_a = ret.get_or_create_node((i, j, East));
-                    ret.graph.add_edge(one_turn_a, north, 1000);
+                    ret.graph.add_edge(one_turn_a, north, 1001);
                     let one_turn_b = ret.get_or_create_node((i, j, West));
-                    ret.graph.add_edge(one_turn_b, north, 1000);
+                    ret.graph.add_edge(one_turn_b, north, 1001);
                     let two_turns = ret.get_or_create_node((i, j, South));
-                    ret.graph.add_edge(two_turns, north, 2000);
+                    ret.graph.add_edge(two_turns, north, 2001);
                 }
 
                 // We can always go east and south without underflow -- if they're beyond the grid,
@@ -117,22 +117,22 @@ impl Graph {
                     let no_turns = ret.get_or_create_node((i, j, East));
                     ret.graph.add_edge(no_turns, east, 1);
                     let one_turn_a = ret.get_or_create_node((i, j, North));
-                    ret.graph.add_edge(one_turn_a, east, 1000);
+                    ret.graph.add_edge(one_turn_a, east, 1001);
                     let one_turn_b = ret.get_or_create_node((i, j, South));
-                    ret.graph.add_edge(one_turn_b, east, 1000);
+                    ret.graph.add_edge(one_turn_b, east, 1001);
                     let two_turns = ret.get_or_create_node((i, j, West));
-                    ret.graph.add_edge(two_turns, east, 2000);
+                    ret.graph.add_edge(two_turns, east, 2001);
                 }
                 {
                     let south = ret.get_or_create_node((i + 1, j, South));
                     let no_turns = ret.get_or_create_node((i, j, South));
                     ret.graph.add_edge(no_turns, south, 1);
                     let one_turn_a = ret.get_or_create_node((i, j, East));
-                    ret.graph.add_edge(one_turn_a, south, 1000);
+                    ret.graph.add_edge(one_turn_a, south, 1001);
                     let one_turn_b = ret.get_or_create_node((i, j, West));
-                    ret.graph.add_edge(one_turn_b, south, 1000);
+                    ret.graph.add_edge(one_turn_b, south, 1001);
                     let two_turns = ret.get_or_create_node((i, j, North));
-                    ret.graph.add_edge(two_turns, south, 2000);
+                    ret.graph.add_edge(two_turns, south, 2001);
                 }
             }
         }
