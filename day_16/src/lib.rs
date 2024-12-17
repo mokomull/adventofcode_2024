@@ -2,6 +2,7 @@ use anyhow::anyhow;
 use petgraph::{
     algo::dijkstra,
     graph::{DiGraph, NodeIndex},
+    visit::{EdgeRef, Reversed},
 };
 use prelude::*;
 
@@ -99,8 +100,16 @@ impl Day for Solution {
         // Getting to the start should be zero cost, but double-check that it's actually in our map.
         assert!(distances.contains_key(&start));
 
+        // the distance *from* any node *to* each of the end nodes -- Reversed() flips the edges
+        // around so I don't have to think too hard whether the problem is precisely symmetrical.
+        let distance_to_end_nodes = end_nodes
+            .iter()
+            .cloned()
+            .map(|n| dijkstra(Reversed(&graph.graph), n, None, |e| *e.weight()))
+            .collect_vec();
+
         let mut visited = HashSet::new();
-        for (&node, &distance) in distances.iter() {
+        for (node, &distance) in distances.iter() {
             if distance > target {
                 // we've already blown the budget so stop even thinking about it
                 continue;
@@ -108,10 +117,9 @@ impl Day for Solution {
 
             // if this node is on *a* shortest path, then (shortest path from start to this) +
             // (shortest path from this to end) must equal our target.
-            let second_halves = dijkstra(&graph.graph, node, None, |e| *e.weight());
-            let second_half = end_nodes
+            let second_half = distance_to_end_nodes
                 .iter()
-                .flat_map(|n| second_halves.get(n).cloned())
+                .flat_map(|second_halves| second_halves.get(node).cloned())
                 .min();
 
             // this node might be part of a wall, in which case there is no path to any end tile.
