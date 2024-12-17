@@ -54,7 +54,17 @@ impl Solution {
     }
 
     pub fn part2(&self) -> anyhow::Result<u64> {
-        'next_initial_value: for a in 0.. {
+        for i in 0..=7 {
+            if let Ok(res) = self.search(i, 1) {
+                return Ok(res);
+            }
+        }
+        anyhow::bail!("None was ever found")
+    }
+
+    fn search(&self, a: u64, target_length: usize) -> Result<u64, ()> {
+        eprintln!("looking for length {target_length} with {a:b}");
+        'next_initial_value: for i in 0..=7 {
             let mut computer = Computer::from(self);
             computer.a = a;
             let mut output = Vec::new();
@@ -70,12 +80,18 @@ impl Solution {
                 }
             }
 
-            if output == self.program {
-                return Ok(a);
+            if output.len() == target_length && self.program.ends_with(&output) {
+                if target_length == self.program.len() {
+                    return Ok((a << 3) + i);
+                }
+
+                if let Ok(res) = self.search((a << 3) + i, target_length + 1) {
+                    return Ok(res);
+                }
             }
         }
 
-        anyhow::bail!("None was ever found.")
+        Err(())
     }
 }
 
