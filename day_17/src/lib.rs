@@ -97,7 +97,7 @@ impl Computer {
                 self.b = self.this_combo() % 8;
             }
             3 => {
-                if self.a == 0 {
+                if self.a != 0 {
                     self.ip = self.program[self.ip + 1] as usize;
                     dont_inc = true;
                 }
