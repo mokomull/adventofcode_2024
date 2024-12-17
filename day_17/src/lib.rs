@@ -54,7 +54,47 @@ impl Solution {
     }
 
     pub fn part2(&self) -> anyhow::Result<u64> {
-        todo!()
+        for i in 0..=7 {
+            // We can't actually look for zero length because the `out` instruction always seems to
+            // execute at least once.  So try all of our initial conditions.
+            if let Ok(res) = self.search(i, 1) {
+                return Ok(res);
+            }
+        }
+        anyhow::bail!("None was ever found")
+    }
+
+    fn search(&self, a: u64, target_length: usize) -> Result<u64, ()> {
+        eprintln!("looking for length {target_length} with {a:b}");
+
+        let mut computer = Computer::from(self);
+        computer.a = a;
+        let mut output = Vec::new();
+
+        let mut seen = HashSet::new();
+        while let ControlFlow::Continue(x) = computer.step() {
+            if !seen.insert((computer.a, computer.b, computer.c, computer.ip)) {
+                // we've hit an infinite loop.
+                return Err(());
+            }
+            if let Some(x) = x {
+                output.push(x);
+            }
+        }
+
+        if output.len() == target_length && self.program.ends_with(&output) {
+            if target_length == self.program.len() {
+                return Ok(a);
+            }
+
+            for i in 0..=7 {
+                if let Ok(res) = self.search((a << 3) + i, target_length + 1) {
+                    return Ok(res);
+                }
+            }
+        }
+
+        Err(())
     }
 }
 
