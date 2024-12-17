@@ -106,7 +106,7 @@ impl Computer {
                 self.b = self.b ^ self.c;
             }
             5 => {
-                output = Some(self.this_combo());
+                output = Some(self.this_combo() % 8);
             }
             6 => {
                 self.b = self.a >> self.this_combo();
