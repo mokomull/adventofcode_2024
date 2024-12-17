@@ -109,10 +109,10 @@ impl Computer {
                 output = Some(self.this_combo());
             }
             6 => {
-                self.b >>= self.this_combo();
+                self.b = self.a >> self.this_combo();
             }
             7 => {
-                self.c >>= self.this_combo();
+                self.c = self.a >> self.this_combo();
             }
 
             x => panic!("unexpected instruction {x}"),
