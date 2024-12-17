@@ -2,7 +2,6 @@ use anyhow::anyhow;
 use petgraph::{
     algo::dijkstra,
     graph::{DiGraph, NodeIndex},
-    visit::EdgeRef,
 };
 use prelude::*;
 
@@ -92,52 +91,42 @@ impl Day for Solution {
             graph.get_or_create_node((end.0, end.1, South)),
         ];
         let target = end_nodes
-            .into_iter()
-            .flat_map(|n| distances.get(&n).cloned())
+            .iter()
+            .flat_map(|n| distances.get(n).cloned())
             .min()
             .unwrap();
 
-        struct Visitation {
-            path: Vec<NodeIndex>,
-            total_cost: u64,
-        }
+        // Getting to the start should be zero cost, but double-check that it's actually in our map.
+        assert!(distances.contains_key(&start));
+
         let mut visited = HashSet::new();
-        let mut to_visit = vec![Visitation {
-            path: vec![start],
-            total_cost: 0,
-        }];
-        while let Some(v) = to_visit.pop() {
-            if v.total_cost > target {
-                // we've already gone too far
+        for (&node, &distance) in distances.iter() {
+            if distance > target {
+                // we've already blown the budget so stop even thinking about it
                 continue;
             }
 
-            let this = v.path.last().unwrap();
+            // if this node is on *a* shortest path, then (shortest path from start to this) +
+            // (shortest path from this to end) must equal our target.
+            let second_halves = dijkstra(&graph.graph, node, None, |e| *e.weight());
+            let second_half = end_nodes
+                .iter()
+                .flat_map(|n| second_halves.get(n).cloned())
+                .min();
 
-            if end_nodes.contains(this) {
-                // we found the end, and we must have met our target distance, so mark the whole
-                // path as "on a shortest path".  Going any further will add more cost, so also
-                // don't bother.
-                for node in v.path {
+            // this node might be part of a wall, in which case there is no path to any end tile.
+            // So we have to make sure `min()` returned Some.
+            if let Some(second_half) = second_half {
+                if distance + second_half == target {
                     visited.insert(node);
                 }
-                continue;
-            }
-
-            for e in graph.graph.edges(*this) {
-                let mut path = v.path.clone();
-                path.push(e.target());
-                to_visit.push(Visitation {
-                    path,
-                    total_cost: v.total_cost + e.weight(),
-                });
             }
         }
 
         Ok(graph
             .node_indexes
             .into_iter()
-            .filter(|(_name, idx)| visited.contains(&idx))
+            .filter(|(_name, idx)| visited.contains(idx))
             .map(|((i, j, _dir), _idx)| (i, j))
             .collect::<HashSet<_>>()
             .len() as u64)
