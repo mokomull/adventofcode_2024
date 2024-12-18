@@ -1,5 +1,6 @@
 use std::collections::VecDeque;
 
+use anyhow::Ok;
 use prelude::*;
 
 #[cfg(test)]
@@ -9,8 +10,8 @@ pub struct Solution<const COUNT: usize, const DIMENSION: u8> {
     bytes: Vec<(u8, u8)>,
 }
 
-impl<const COUNT: usize, const DIMENSION: u8> Day for Solution<COUNT, DIMENSION> {
-    fn new(input: &str) -> Self {
+impl<const COUNT: usize, const DIMENSION: u8> Solution<COUNT, DIMENSION> {
+    pub fn new(input: &str) -> Self {
         Self {
             bytes: input
                 .lines()
@@ -22,7 +23,7 @@ impl<const COUNT: usize, const DIMENSION: u8> Day for Solution<COUNT, DIMENSION>
         }
     }
 
-    fn part1(&self) -> anyhow::Result<u64> {
+    pub fn part1(&self) -> anyhow::Result<u64> {
         let corrupted = self
             .bytes
             .iter()
@@ -35,8 +36,18 @@ impl<const COUNT: usize, const DIMENSION: u8> Day for Solution<COUNT, DIMENSION>
         distance_to_end::<DIMENSION>(&corrupted)
     }
 
-    fn part2(&self) -> anyhow::Result<u64> {
-        todo!()
+    pub fn part2(&self) -> anyhow::Result<String> {
+        let mut corrupted = HashSet::new();
+
+        for &(i, j) in &self.bytes {
+            corrupted.insert((i, j));
+
+            if let Err(_) = distance_to_end::<DIMENSION>(&corrupted) {
+                return Ok(format!("{i},{j}"));
+            }
+        }
+
+        anyhow::bail!("the end is always reachable");
     }
 }
 
