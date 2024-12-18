@@ -1,6 +1,5 @@
 use std::collections::VecDeque;
 
-use anyhow::Ok;
 use prelude::*;
 
 #[cfg(test)]
@@ -38,12 +37,16 @@ impl<const COUNT: usize, const DIMENSION: u8> Solution<COUNT, DIMENSION> {
 
     pub fn part2(&self) -> anyhow::Result<String> {
         let mut corrupted = HashSet::new();
+        let mut last_path: Option<Vec<(u8, u8)>> = None;
 
         for &(i, j) in &self.bytes {
             corrupted.insert((i, j));
 
-            if let Err(_) = find_end::<DIMENSION>(&corrupted) {
-                return Ok(format!("{i},{j}"));
+            if last_path.is_none() || last_path.as_ref().unwrap().contains(&(i, j)) {
+                match find_end::<DIMENSION>(&corrupted) {
+                    Err(_) => return Ok(format!("{i},{j}")),
+                    Ok(p) => last_path = Some(p),
+                }
             }
         }
 
