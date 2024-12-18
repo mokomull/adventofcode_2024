@@ -30,6 +30,8 @@ impl<const COUNT: usize, const DIMENSION: u8> Day for Solution<COUNT, DIMENSION>
             .take(COUNT)
             .collect::<HashSet<_>>();
 
+        assert_eq!(COUNT, corrupted.len());
+
         let mut to_visit = VecDeque::from([((0, 0), 0)]);
         let mut visited = HashSet::new();
 
