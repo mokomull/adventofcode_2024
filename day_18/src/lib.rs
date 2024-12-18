@@ -32,7 +32,7 @@ impl<const COUNT: usize, const DIMENSION: u8> Solution<COUNT, DIMENSION> {
 
         assert_eq!(COUNT, corrupted.len());
 
-        find_end::<DIMENSION>(&corrupted).map(|p| p.len() as u64)
+        distance_to_end::<DIMENSION>(&corrupted)
     }
 
     pub fn part2(&self) -> anyhow::Result<String> {
@@ -54,11 +54,11 @@ impl<const COUNT: usize, const DIMENSION: u8> Solution<COUNT, DIMENSION> {
     }
 }
 
-fn find_end<const DIMENSION: u8>(corrupted: &HashSet<(u8, u8)>) -> anyhow::Result<Vec<(u8, u8)>> {
-    let mut to_visit = VecDeque::from([((0, 0), vec![])]);
+fn distance_to_end<const DIMENSION: u8>(corrupted: &HashSet<(u8, u8)>) -> anyhow::Result<u64> {
+    let mut to_visit = VecDeque::from([((0, 0), 0)]);
     let mut visited = HashSet::new();
 
-    while let Some(((i, j), mut p)) = to_visit.pop_front() {
+    while let Some(((i, j), d)) = to_visit.pop_front() {
         if !visited.insert((i, j)) {
             // we've already been here
             continue;
@@ -70,22 +70,20 @@ fn find_end<const DIMENSION: u8>(corrupted: &HashSet<(u8, u8)>) -> anyhow::Resul
         }
 
         if (i, j) == (DIMENSION, DIMENSION) {
-            return Ok(p);
+            return Ok(d);
         }
-
-        p.push((i, j));
 
         if i > 0 {
-            to_visit.push_back(((i - 1, j), p.clone()));
+            to_visit.push_back(((i - 1, j), d + 1));
         }
         if j > 0 {
-            to_visit.push_back(((i, j - 1), p.clone()));
+            to_visit.push_back(((i, j - 1), d + 1));
         }
         if i < DIMENSION {
-            to_visit.push_back(((i + 1, j), p.clone()));
+            to_visit.push_back(((i + 1, j), d + 1));
         }
         if j < DIMENSION {
-            to_visit.push_back(((i, j + 1), p));
+            to_visit.push_back(((i, j + 1), d + 1));
         }
     }
 
